@@ -48,12 +48,7 @@ class LoginController extends Controller
      */
     public function redirectToProvider()
     {
-        return Socialite::driver('google')
-        // ->with(
-        //     ['client_id' => '668861247276-n3ub3d6shev839a9lq5t5v9lh57dibo2.apps.googleusercontent.com'],
-        //     ['client_secret' => '0qkx8NeMiQKCD36DbCaLp6I8'],
-        //     ['redirect' => 'http://nmstracker.com/login/google/callback'])
-        ->redirect();
+        return Socialite::driver('google')->redirect();
     }
 
     /**
