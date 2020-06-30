@@ -17,15 +17,15 @@
             </div>
             <div class="form-group">
                 {{Form::label('priority','Priority')}}
-                {{Form::select('priority', ['high' => 'High', 'normal' => 'Normal','low' => 'Low'],['class'=>'form-control'])}}
+                {{Form::select('priority', ['high' => 'High', 'normal' => 'Normal','low' => 'Low'],null,['class'=>'form-control'])}}
             </div>
             <div class="form-group">
                 {{Form::label('tracker','Tracker')}}
-                {{Form::select('tracker', ['bug' => 'Bug', 'feature' => 'Feature'],['class'=>'form-control'])}}
+                {{Form::select('tracker', ['bug' => 'Bug', 'feature' => 'Feature'],null,['class'=>'form-control'])}}
             </div>
             <div class="form-group">
                 {{Form::label('status','Status')}}
-                {{Form::select('status', ['new' => 'New', 'close' => 'Close', 'assigned' => 'Assigned', 'in-Progress' => 'In-Progress', 'resolved' => 'Resolved'],['class'=>'form-control'])}}
+                {{Form::select('status', ['new' => 'New', 'close' => 'Close', 'assigned' => 'Assigned', 'in-Progress' => 'In-Progress', 'resolved' => 'Resolved'],null,['class'=>'form-control'])}}
             </div>
             <div class="form-group">
                 {{Form::label('description','Description')}}

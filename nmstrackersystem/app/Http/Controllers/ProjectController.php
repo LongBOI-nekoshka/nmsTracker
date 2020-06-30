@@ -59,7 +59,7 @@ class ProjectController extends Controller
         $project->Description = $request->input('description');
         $project->user_id = auth()->user()->id;
         $project->save();
-        return redirect('/project')->with('success','Project Created');
+        return redirect('/dashboard')->with('success','Project Created');
     }
 
     /**
@@ -71,9 +71,8 @@ class ProjectController extends Controller
     public function show($id)
     {
         //
-        $user_id = auth()->user()->id;
         $project = Project::find($id);
-        $owner = User::where('id',$user_id)->get();
+        $owner = User::where('id',$project->user_id)->get();
         return view('projects.show',compact('project','owner'));
     }
 
@@ -86,6 +85,12 @@ class ProjectController extends Controller
     public function edit($id)
     {
         //
+        $project = Project::find($id);
+        //Check for correct User
+        if(auth()->user()->id !== $project->user_id) {
+            return redirect('/project')->with('error' , 'Unauthorized Page');
+        }
+        return view('projects.edit')->with('project' , $project);
     }
 
     /**
@@ -98,6 +103,19 @@ class ProjectController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $this->validate($request, [
+            'project_Name' => 'required',
+            'description' => 'required'
+        ]);
+
+        $project = project::find($id);
+        if(auth()->user()->id !== $project->user_id) {
+            return redirect('/project')->with('error', 'Unauthorize Page');
+        }
+        $project->ProjectName = $request->input('project_Name');
+        $project->Description = $request->input('description');
+        $project->save();
+        return redirect('/dashboard')->with('success','Project Created');
     }
 
     /**
@@ -109,5 +127,12 @@ class ProjectController extends Controller
     public function destroy($id)
     {
         //
+        $project = project::find($id);
+        if(auth()->user()->id !== $project->user_id) {
+            return redirect('/project')->with('error', 'Unauthorize Page');
+        }
+
+        $project->delete();
+        return redirect('/dashboard')->with('success','Project Got Rekt');
     }
 }

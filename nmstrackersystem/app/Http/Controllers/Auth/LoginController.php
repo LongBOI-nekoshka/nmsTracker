@@ -48,12 +48,11 @@ class LoginController extends Controller
      */
     public function redirectToProvider()
     {
-        return Socialite::driver('google')
+        return Socialite::driver('google')->redirect();
         // ->with(
         //     ['client_id' => '668861247276-n3ub3d6shev839a9lq5t5v9lh57dibo2.apps.googleusercontent.com'],
         //     ['client_secret' => '0qkx8NeMiQKCD36DbCaLp6I8'],
         //     ['redirect' => 'http://nmstracker.com/login/google/callback'])
-        ->redirect();
     }
 
     /**
@@ -65,18 +64,22 @@ class LoginController extends Controller
     {
         $user = Socialite::driver('google')->stateless()->user();
 
-        $user_con = User::where('provider_id',$user->getID())->first();
-        // dd($user);
+        $user_check = User::where('provider_id',$user->getID())->first();
+        
         //add to dbase
-        if(!$user_con) {
-            $user = User::create([
+        if(!$user_check) {
+            $user_check = User::create([
                 'email' =>$user->getEmail(),
                 'name' =>$user->getName(),
                 'provider_id' =>$user->getID(),
             ]);
+            $user_check = User::where('provider_id',$user->getID())->first();
+            Auth::login($user_check,true);
+            return redirect($this->redirectTo);
         }
 
-        Auth::login($user,true);
+        // dd($user);
+        Auth::login($user_check,true);
 
         return redirect($this->redirectTo);
     }

@@ -9,11 +9,11 @@ class Project extends Model
     protected $table = 'projects';
     public $primaryKey = 'Project_Id';
 
-    Public function issues() {
+    public function issues() {
         return $this->hasMany('App\Issue');
     }
 
-    Public function user() {
+    public function user() {
         return $this->belongsTo('App\User');
     }
 }

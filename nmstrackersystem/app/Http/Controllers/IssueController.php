@@ -70,9 +70,10 @@ class IssueController extends Controller
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');
+        $issue->Issuer_Id = auth()->user()->id;
         $issue->Project_Id = $request->input('secret');
         $issue->save();
-        return redirect('/project')->with('success', 'Issue have been submited');
+        return redirect('/project/'.$request->input('secret').'/issue')->with('success', 'Issue have been submited');
     }
 
     /**
@@ -84,7 +85,7 @@ class IssueController extends Controller
     public function show($id,$idd)
     {
         $issue = Issue::where('Issue_Id',$idd)->get();
-        return view('issues.show',compact(['issue', 'id']));
+        return view('issues.show',compact(['issue', 'id','idd']));
     }
 
     /**
@@ -93,9 +94,16 @@ class IssueController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id,$idd)
     {
         //
+        $issue = Issue::find($idd);
+        // $role = Role::find();
+        if(auth()->user()->id !== $issue->Issuer_Id) {
+            return redirect('/project/'.$id.'/issue/')->with('error' , 'Unauthorized Page');
+        }
+
+        return view('issues.edit',compact(['issue', 'id','idd']));
     }
 
     /**
@@ -105,9 +113,34 @@ class IssueController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id,$idd)
     {
         //
+        $this->validate($request, [
+            'name'=>'required',
+            'description'=>'required',
+            'picture' => 'image|nullable|max:1999'
+        ]);
+
+        if($request->hasFile('picture')) {
+            $fileNameWithExt = $request->file('picture')->getClientOriginalName();
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            $extention = $request->file('picture')->getClientOriginalExtension();
+            $fileNameToStore = $filename.'_'.time().'.'. $extention;
+            $path = $request->file('picture')->storeAs('public/picture', $fileNameToStore);
+        }else {
+            $fileNameToStore = 'noimage.jpg';
+        }
+        $issue = Issue::find($idd);
+        $issue->Name = $request->input('name');
+        $issue->Description = $request->input('description');
+        $issue->Picture = $fileNameToStore;
+        $issue->Email = $request->input('email');
+        $issue->Priority = $request->input('priority');
+        $issue->tracker = $request->input('tracker');
+        $issue->status = $request->input('status');
+        $issue->save();
+        return redirect('/project')->with('success', 'Issue have been submited');
     }
 
     /**
@@ -116,8 +149,15 @@ class IssueController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,$idd)
     {
         //
+        $issue = Issue::find($idd);
+        if(auth()->user()->id !== $issue->Issuer_Id) {
+            return redirect('/project/'.$id.'/issue')->with('error', 'Unauthorize Page');
+        }
+
+        $issue->delete();
+        return redirect('/project/'.$id.'/issue')->with('success','Issue is deleted');
     }
 }

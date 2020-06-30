@@ -16,11 +16,6 @@
             <li class="nav-item">
               <a class="nav-link" href="/about">About</a>
             </li>
-            @if(!Auth::guest())
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard">Dashboard</a>
-                </li>
-            @endif
           </ul>
 
           <!-- Right Side Of Navbar -->
@@ -47,6 +42,7 @@
                                            document.getElementById('logout-form').submit();">
                               {{ __('Logout') }}
                           </a>
+                              <a class="dropdown-item" href="/dashboard">Dashboard</a>
 
                           <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                               @csrf

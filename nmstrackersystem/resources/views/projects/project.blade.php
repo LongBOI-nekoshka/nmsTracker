@@ -5,6 +5,11 @@
         <br>
         <h2><strong>Projects</strong></h2>
         <br>
+        <a href="/" class="btn btn-secondary">Go back</a>
+        @if (!Auth::guest())
+            <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+        @endif
+        <br><br>
         @if(count($projects) >= 1)
             <ul class='list-group'>
                 @foreach ($projects as $project)

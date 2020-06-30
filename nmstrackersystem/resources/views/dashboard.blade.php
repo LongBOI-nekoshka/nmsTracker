@@ -13,6 +13,7 @@
                         </div>
                     @endif
                     <a href="/project/create" class="btn btn-primary"> Create Project</a>
+                    <a href="/project" class="btn btn-secondary"> See other's project</a>
                     <br><br>
                     @if(count($projects) >= 1)
                         <table class="table">
