@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Jun 29, 2020 at 01:53 PM
+-- Generation Time: Jun 30, 2020 at 12:47 PM
 -- Server version: 10.3.12-MariaDB
 -- PHP Version: 7.3.1
 
@@ -61,14 +61,7 @@ CREATE TABLE IF NOT EXISTS `issues` (
   `status` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tracker` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`Issue_Id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `issues`
---
-
-INSERT INTO `issues` (`Issue_Id`, `Name`, `Description`, `Email`, `Priority`, `Picture`, `Project_Id`, `Employee_Id`, `Issuer_Id`, `created_at`, `updated_at`, `status`, `tracker`) VALUES
-(1, 'E', 'E', NULL, 'high', 'noimage.jpg', 1, NULL, NULL, '2020-06-29 03:55:22', '2020-06-29 03:55:22', 'new', 'bug');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -82,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `migrations`
@@ -97,7 +90,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (6, '2020_06_26_072152_add_description_to_projects', 1),
 (7, '2020_06_27_020817_add_status_column_to_issues', 1),
 (8, '2020_06_29_065813_add_user_id_to_projects', 1),
-(9, '2020_06_29_080218_add_tracker_column_to__issues', 1);
+(9, '2020_06_29_080218_add_tracker_column_to__issues', 1),
+(10, '2020_06_30_022306_create_roles_table', 1);
 
 -- --------------------------------------------------------
 
@@ -128,14 +122,22 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `Description` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`Project_Id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
 
 --
--- Dumping data for table `projects`
+-- Table structure for table `roles`
 --
 
-INSERT INTO `projects` (`Project_Id`, `ProjectName`, `created_at`, `updated_at`, `Description`, `user_id`) VALUES
-(1, 'Project 1', '2020-06-29 03:03:47', '2020-06-29 03:03:47', 'This is Project 1', 1);
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE IF NOT EXISTS `roles` (
+  `project_Id` int(11) NOT NULL,
+  `User_Id` int(11) NOT NULL,
+  `User_Role` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -156,14 +158,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `provider_id`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Adam Sobremonte', 'adamsobremonte@gmail.com', NULL, NULL, '113184073106244416738', 'Z8p6Kacnk4hPJUy9hhEiIQeurbpDc1FC3YY18pchSeT1RkFlOXjyRwVxN3yw', '2020-06-29 03:03:10', '2020-06-29 03:03:10');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
