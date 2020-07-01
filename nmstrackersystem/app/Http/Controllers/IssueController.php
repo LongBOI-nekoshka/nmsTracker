@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Issue;
+use App\Rules\Captcha;
 use App\Project;
+use App\Issue;
 use App\User;
 use DB;
 
@@ -46,11 +47,11 @@ class IssueController extends Controller
      */
     public function store(Request $request)
     {
-            
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',
-            'picture' => 'image|nullable|max:1999'
+            'picture' => 'image|nullable|max:1999',
+            'g-recaptcha-response' => new Captcha()
         ]);
 
         if($request->hasFile('picture')) {

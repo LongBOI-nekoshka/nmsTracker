@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@extends('includes.recapcha3')
 
 @section('content')
     <div class="container">
@@ -34,6 +35,9 @@
                 {{Form::file('picture')}}
             </div>
             {{Form::hidden('secret',$project_Id->Project_Id)}}
+            <div class="g-recaptcha" data-sitekey="{{env('RECAPTCHA_SITEKEY')}}">
+            </div>
+            <br>
             {{Form::submit('Submit',['class' => 'btn btn-primary'])}}
         {!! Form::close() !!}
     </div>
