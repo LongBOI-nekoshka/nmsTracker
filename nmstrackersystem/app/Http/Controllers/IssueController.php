@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Rules\Captcha;
 use App\Project;
 use App\Issue;
 use App\User;
@@ -11,6 +10,10 @@ use DB;
 
 class IssueController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth',['except' => ['index','show','create','store']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -33,10 +36,12 @@ class IssueController extends Controller
     public function create($id)
     {
         //
-        $project_id = Project::find($id);
-        // check user rank
-        // $user_id = User::find(auth()->user()->id);
-        return view('issues.create')->with('project_Id',$project_id);
+        $project_Id = Project::find($id);
+        if(empty(auth()->user())) {
+            return view('issues.create')->with('project_Id',$project_Id);
+        }
+        $user_email = User::find(auth()->user()->id);
+        return view('issues.create',compact('project_Id','user_email'));
     }
 
     /**
@@ -50,8 +55,8 @@ class IssueController extends Controller
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',
+            'g-recaptcha-response' => 'required',
             'picture' => 'image|nullable|max:1999',
-            'g-recaptcha-response' => new Captcha()
         ]);
 
         if($request->hasFile('picture')) {
@@ -64,14 +69,19 @@ class IssueController extends Controller
             $fileNameToStore = 'noimage.jpg';
         }
         $issue = new Issue;
+        if(!empty(auth()->user())) {
+            $user_email = User::find(auth()->user()->id);
+            $issue->Issuer_Id = auth()->user()->id;
+            $issue->Email = $user_email->email;
+        }else {
+            $issue->Email = $request->input('email');
+        }
         $issue->Name = $request->input('name');
         $issue->Description = $request->input('description');
         $issue->Picture = $fileNameToStore;
-        $issue->Email = $request->input('email');
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');
-        $issue->Issuer_Id = auth()->user()->id;
         $issue->Project_Id = $request->input('secret');
         $issue->save();
         return redirect('/project/'.$request->input('secret').'/issue')->with('success', 'Issue have been submited');
@@ -86,6 +96,10 @@ class IssueController extends Controller
     public function show($id,$idd)
     {
         $issue = Issue::where('Issue_Id',$idd)->get();
+        if(!empty(auth()->user())) {
+            $user_Info = User::find(auth()->user()->id);
+            return view('issues.show',compact(['issue', 'id','idd','user_Info']));
+        }
         return view('issues.show',compact(['issue', 'id','idd']));
     }
 
@@ -99,12 +113,11 @@ class IssueController extends Controller
     {
         //
         $issue = Issue::find($idd);
-        // $role = Role::find();
-        if(auth()->user()->id !== $issue->Issuer_Id) {
-            return redirect('/project/'.$id.'/issue/')->with('error' , 'Unauthorized Page');
+        $user_Info = User::find(auth()->user()->id);
+        if(auth()->user()->id === $issue->Issuer_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod') {
+            return view('issues.edit',compact(['issue', 'id','idd']));
         }
-
-        return view('issues.edit',compact(['issue', 'id','idd']));
+        return redirect('/project/'.$id.'/issue/')->with('error' , 'Unauthorized Page');
     }
 
     /**
@@ -136,7 +149,6 @@ class IssueController extends Controller
         $issue->Name = $request->input('name');
         $issue->Description = $request->input('description');
         $issue->Picture = $fileNameToStore;
-        $issue->Email = $request->input('email');
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');
@@ -154,11 +166,12 @@ class IssueController extends Controller
     {
         //
         $issue = Issue::find($idd);
-        if(auth()->user()->id !== $issue->Issuer_Id) {
-            return redirect('/project/'.$id.'/issue')->with('error', 'Unauthorize Page');
-        }
-
-        $issue->delete();
-        return redirect('/project/'.$id.'/issue')->with('success','Issue is deleted');
+        $user_Info = User::find(auth()->user()->id);
+        if(auth()->user()->id === $issue->Issuer_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod') {
+            
+            $issue->delete();
+            return redirect('/project/'.$id.'/issue')->with('success','Issue is deleted');
+        }        
+        return redirect('/project/'.$id.'/issue')->with('error', 'Unauthorize Page');
     }
 }

@@ -90,6 +90,7 @@ class ProjectController extends Controller
         if(auth()->user()->id !== $project->user_id) {
             return redirect('/project')->with('error' , 'Unauthorized Page');
         }
+        
         return view('projects.edit')->with('project' , $project);
     }
 

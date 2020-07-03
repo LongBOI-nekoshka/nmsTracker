@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use Auth;
 
 class DashboardController extends Controller
 {
@@ -26,6 +27,16 @@ class DashboardController extends Controller
     {
         $user_id = auth()->user()->id;
         $user = User::find($user_id);
-        return view('dashboard')->with('projects',$user->projects);
+        $projects = $user->projects;
+        if(empty($user->role)) {
+            $user->role = 'user';
+            $user->save();
+        }
+        $user_role = $user->role;
+        if($user_role == 'disabled') {
+            Auth::logout();
+            return redirect('/')->with('error','Sorry but, you have been banned. ;(');
+        }
+        return view('dashboard',compact('projects','user_role'));
     }
 }

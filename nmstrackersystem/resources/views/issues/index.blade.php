@@ -18,7 +18,6 @@
                             <th scope="col">Priority</th>
                             <th scope="col">Status</th>
                             <th scope="col">Tracker</th>
-                            <th scope="col">Assignee</th>
                             <th scope="col">Updated</th>
                         </tr>
                     </thead>
@@ -29,7 +28,6 @@
                         <td class="table-warning">{{$issue->Priority}}</td>
                         <td class="table-warning">{{$issue->status}}</td>
                         <td class="table-warning">{{$issue->tracker}}</td>
-                        <td class="table-warning">{{$issue->Employee_Id}}</td>
                         <td class="table-warning">{{$issue->updated_at}}</td>
                     </tr>
                     @endforeach

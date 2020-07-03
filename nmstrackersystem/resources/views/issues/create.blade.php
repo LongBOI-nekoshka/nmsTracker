@@ -13,20 +13,41 @@
                 {{Form::text('name','',['class' => 'form-control','placeholder' => 'Name of Issue'])}}
             </div>
             <div class="form-group">
+                @if(Auth::guest())
                 {{Form::label('email','Email')}}
                 {{Form::text('email','',['class' => 'form-control','placeholder' => 'Email'])}}
+                @endif
+                @if(!Auth::guest())
+                    {{Form::label('email','Email')}}
+                    {{Form::text('email',$user_email->email,['class' => 'form-control','placeholder' => 'Email','disabled'])}}
+                @endif
             </div>
             <div class="form-group">
-                {{Form::label('priority','Priority')}}
-                {{Form::select('priority', ['high' => 'High', 'normal' => 'Normal','low' => 'Low'],null,['class'=>'form-control'])}}
+                @if(Auth::guest())
+                    {{Form::label('priority','Priority')}}
+                    {{Form::select('priority', ['normal' => 'Normal'],'normal',['class'=>'form-control'])}}
+                @endif
+                @if(!Auth::guest())
+                    {{Form::label('priority','Priority')}}
+                    {{Form::select('priority', ['high' => 'High' , 'normal' => 'Normal' ,'low' => 'Low'],'normal',['class'=>'form-control'])}}
+                @endif
             </div>
             <div class="form-group">
                 {{Form::label('tracker','Tracker')}}
                 {{Form::select('tracker', ['bug' => 'Bug', 'feature' => 'Feature'],null,['class'=>'form-control'])}}
             </div>
             <div class="form-group">
+                @if (!Auth::guest())
+                    {{Form::label('status','Status')}}
+                    {{Form::select('status', ['new' => 'New', 'close' => 'Close', 'assigned' => 'Assigned', 'in-Progress' => 'In-Progress', 'resolved' => 'Resolved'],'new',['class'=>'form-control','id'=>'status','onchange'=>'change()'])}}
+                    <div id="assignee" style="display: none">
+                        <h1>E</h1>
+                    </div>
+                @endif
+                @if (Auth::guest())
                 {{Form::label('status','Status')}}
-                {{Form::select('status', ['new' => 'New', 'close' => 'Close', 'assigned' => 'Assigned', 'in-Progress' => 'In-Progress', 'resolved' => 'Resolved'],null,['class'=>'form-control'])}}
+                {{Form::select('status', ['new' => 'New'],'new',['class'=>'form-control'])}}
+                @endif
             </div>
             <div class="form-group">
                 {{Form::label('description','Description')}}
@@ -42,3 +63,14 @@
         {!! Form::close() !!}
     </div>
 @endsection
+<script>
+    function change() {
+        var x = document.getElementById("status").value;
+        if(x == 'assigned') {
+            document.getElementById("assignee").style.display = 'block';
+        }else {
+            document.getElementById("assignee").style.display = 'none';
+        }
+        
+    }
+</script>

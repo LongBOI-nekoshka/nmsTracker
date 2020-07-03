@@ -14,6 +14,9 @@
                     @endif
                     <a href="/project/create" class="btn btn-primary"> Create Project</a>
                     <a href="/project" class="btn btn-secondary"> See other's project</a>
+                    @if($user_role == 'admin')
+                        <a href="/admin" class="btn btn-outline-success"> See User</a>
+                    @endif
                     <br><br>
                     @if(count($projects) >= 1)
                         <table class="table">

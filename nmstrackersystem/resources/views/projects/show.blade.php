@@ -40,5 +40,4 @@ function valid() {
         var sub = document.getElementById('bnt_danger').disabled = true;
     }
 }
-
 </script>

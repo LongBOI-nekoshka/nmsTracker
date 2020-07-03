@@ -65,9 +65,9 @@ class LoginController extends Controller
         //add to dbase
         if(!$user_check) {
             $user_check = User::create([
-                'email' =>$user->getEmail(),
-                'name' =>$user->getName(),
-                'provider_id' =>$user->getID(),
+                'email' => $user->getEmail(),
+                'name' => $user->getName(),
+                'provider_id' => $user->getID(),
             ]);
             $user_check = User::where('provider_id',$user->getID())->first();
             Auth::login($user_check,true);

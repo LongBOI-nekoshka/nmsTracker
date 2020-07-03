@@ -16,12 +16,12 @@ Route::get('/', 'PagesController@index');
 Route::get('/about', 'PagesController@about');
 Route::resource('/project', 'ProjectController');
 Route::resource('/project/{project}/issue', 'IssueController');
+Route::resource('admin','AdminController',['only'=>['index','update']]);
+Auth::routes();
+Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+Route::get('login/google', 'Auth\LoginController@redirectToProvider');
+Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');
 // Route::get('/', function () {
 //     return view('welcome');
 // });
 
-Auth::routes();
-
-Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
-Route::get('login/google', 'Auth\LoginController@redirectToProvider');
-Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');

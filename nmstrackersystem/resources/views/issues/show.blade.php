@@ -11,7 +11,7 @@
             <br>
             <p>{{$isInfo->Description}}</p>
             @if(!Auth::guest())
-                @if (Auth::user()->id == $isInfo->Issuer_Id)
+                @if (Auth::user()->id == $isInfo->Issuer_Id || $user_Info->role == 'admin' || $user_Info->role == 'mod')
                     <a href="/project/{{$id}}/issue/{{$idd}}/edit" class="btn btn-warning">Edit</a>
                     <br><br>
                     {!!Form::open(['action'=>['IssueController@destroy',$id,$idd],'method'=>'POST','id'=>'form'])!!}

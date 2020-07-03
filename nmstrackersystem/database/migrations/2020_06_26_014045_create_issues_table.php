@@ -21,7 +21,6 @@ class CreateIssuesTable extends Migration
             $table->string('Priority');
             $table->string('Picture')->nullable();
             $table->integer('Project_Id');
-            $table->integer('Employee_Id')->nullable();
             $table->integer('Issuer_Id')->nullable();
             $table->timestamps();
         });
