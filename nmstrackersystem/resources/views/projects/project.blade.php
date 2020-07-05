@@ -5,9 +5,11 @@
         <br>
         <h2><strong>Projects</strong></h2>
         <br>
-        <a href="/" class="btn btn-secondary">Go back</a>
+        @if (Auth::guest())
+            <a href="/" class="btn btn-secondary">Go back</a>              
+        @endif
         @if (!Auth::guest())
-            <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+            <a href="/dashboard" class="btn btn-success">Dashboard</a>              
         @endif
         <br><br>
         @if(count($projects) >= 1)

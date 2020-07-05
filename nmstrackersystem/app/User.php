@@ -5,8 +5,6 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-Use App\Role;
-Use App\Project;
 
 class User extends Authenticatable
 {
@@ -47,7 +45,7 @@ class User extends Authenticatable
         return $this->hasMany('App\Issue');
     }
 
-    public function roles() {
-        return $this->hasMany('App\Role');
+    public function comments() {
+        return $this->hasMany('App\Comments');
     }
 }

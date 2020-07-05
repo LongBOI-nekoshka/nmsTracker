@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <a href="/dashboard" class="btn btn-secondary">Go back</a>
+    <a href="/dashboard" class="btn btn-success">Dashboard</a>
     <br><br>
     <div class="container jumbotron">
             <h4><strong>Create Project</strong></h4>

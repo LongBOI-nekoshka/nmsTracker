@@ -132,7 +132,6 @@ class ProjectController extends Controller
         if(auth()->user()->id !== $project->user_id) {
             return redirect('/project')->with('error', 'Unauthorize Page');
         }
-
         $project->delete();
         return redirect('/dashboard')->with('success','Project Got Rekt');
     }

@@ -19,7 +19,7 @@
                 @endif
                 @if(!Auth::guest())
                     {{Form::label('email','Email')}}
-                    {{Form::text('email',$user_email->email,['class' => 'form-control','placeholder' => 'Email','disabled'])}}
+                    {{Form::text('email',$user_info->email,['class' => 'form-control','placeholder' => 'Email','disabled'])}}
                 @endif
             </div>
             <div class="form-group">
@@ -40,9 +40,29 @@
                 @if (!Auth::guest())
                     {{Form::label('status','Status')}}
                     {{Form::select('status', ['new' => 'New', 'close' => 'Close', 'assigned' => 'Assigned', 'in-Progress' => 'In-Progress', 'resolved' => 'Resolved'],'new',['class'=>'form-control','id'=>'status','onchange'=>'change()'])}}
-                    <div id="assignee" style="display: none">
-                        <h1>E</h1>
-                    </div>
+                    @if($user_info->role == 'user')
+                        <div id="assignee" class="form-group" style="display: none">
+                            <br>
+                            {{Form::label('assignee','Select an Assignee')}}
+                            @foreach ($notAssigned as $noAssigned)
+                                <br>
+                                {{Form::radio('assignee',$noAssigned->id,false,['id'=>'asgn'])}}
+                                {{Form::label('Assignee ID',$noAssigned->id)}}
+                                {{Form::label('Assignee Name',$noAssigned->name)}}
+                            @endforeach
+                        </div>
+                    @else
+                        <div id="assignee" class="form-group" style="display: none">
+                            <br>
+                            {{Form::label('assignee','Select an Assignee')}}
+                            @foreach ($allUsers as $user)
+                                <br>
+                                {{Form::radio('assignee',$user->id,false,['id'=>'asgn'])}}
+                                {{Form::label('Assignee Name',$user->id)}}
+                                {{Form::label('Assignee ID',$user->name)}}
+                            @endforeach
+                        </div>
+                    @endif
                 @endif
                 @if (Auth::guest())
                 {{Form::label('status','Status')}}
@@ -66,10 +86,11 @@
 <script>
     function change() {
         var x = document.getElementById("status").value;
-        if(x == 'assigned') {
+        if(x == 'assigned' || x == 'in-Progress') {
             document.getElementById("assignee").style.display = 'block';
         }else {
             document.getElementById("assignee").style.display = 'none';
+            document.getElementById("asgn").checked = false;
         }
         
     }

@@ -12,4 +12,12 @@ class Issue extends Model
     public function project() {
         return $this->belongsTo('App\Project');
     }
+
+    public function user() {
+        return $this->belongsTo('App\User');
+    }
+
+    public function comments() {
+        return $this->hasMany('App\Comments');
+    }
 }

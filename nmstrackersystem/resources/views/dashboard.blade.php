@@ -14,6 +14,8 @@
                     @endif
                     <a href="/project/create" class="btn btn-primary"> Create Project</a>
                     <a href="/project" class="btn btn-secondary"> See other's project</a>
+                    <a href="/assignedIssues" class="btn btn-warning">Issues assigned to you</a>
+                    <a href="/showAllIssues" class="btn btn-warning">All Issues</a>
                     @if($user_role == 'admin')
                         <a href="/admin" class="btn btn-outline-success"> See User</a>
                     @endif

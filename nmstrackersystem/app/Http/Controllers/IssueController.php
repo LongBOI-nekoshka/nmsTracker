@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Project;
 use App\Issue;
 use App\User;
+use App\Comment;
 use DB;
 
 class IssueController extends Controller
@@ -40,8 +41,10 @@ class IssueController extends Controller
         if(empty(auth()->user())) {
             return view('issues.create')->with('project_Id',$project_Id);
         }
-        $user_email = User::find(auth()->user()->id);
-        return view('issues.create',compact('project_Id','user_email'));
+        $user_info = User::find(auth()->user()->id);
+        $notAssigned = User::whereNull('issues.assignee_Idd')->leftJoin('issues','issues.assignee_Idd','=','users.id')->get();
+        $allUsers = User::where('role','!=','disabled')->get();
+        return view('issues.create',compact('project_Id','user_info','notAssigned','allUsers'));
     }
 
     /**
@@ -58,7 +61,7 @@ class IssueController extends Controller
             'g-recaptcha-response' => 'required',
             'picture' => 'image|nullable|max:1999',
         ]);
-
+        
         if($request->hasFile('picture')) {
             $fileNameWithExt = $request->file('picture')->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -76,9 +79,15 @@ class IssueController extends Controller
         }else {
             $issue->Email = $request->input('email');
         }
+        if(!empty($request->input('assignee'))) {
+            $user = User::find($request->input('assignee'));
+            $issue->assignee_id = $request->input('assignee');
+            $issue->assignee_idd = $request->input('assignee');
+            $issue->assignee = $user->name;
+        }
+        $issue->Picture = $fileNameToStore;
         $issue->Name = $request->input('name');
         $issue->Description = $request->input('description');
-        $issue->Picture = $fileNameToStore;
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');
@@ -95,12 +104,13 @@ class IssueController extends Controller
      */
     public function show($id,$idd)
     {
+        $comments = Comment::where('comments.issue_Id',$idd)->rightjoin('users','users.id','=','comments.user_id')->get();
         $issue = Issue::where('Issue_Id',$idd)->get();
         if(!empty(auth()->user())) {
             $user_Info = User::find(auth()->user()->id);
-            return view('issues.show',compact(['issue', 'id','idd','user_Info']));
+            return view('issues.show',compact(['issue', 'id','idd','user_Info','comments']));
         }
-        return view('issues.show',compact(['issue', 'id','idd']));
+        return view('issues.show',compact(['issue', 'id','idd','comments']));
     }
 
     /**
@@ -113,9 +123,11 @@ class IssueController extends Controller
     {
         //
         $issue = Issue::find($idd);
-        $user_Info = User::find(auth()->user()->id);
-        if(auth()->user()->id === $issue->Issuer_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod') {
-            return view('issues.edit',compact(['issue', 'id','idd']));
+        $user_info = User::find(auth()->user()->id);
+        $notAssigned = User::whereNull('issues.assignee_id')->orWhere('issues.status','!=','assigned')->where('issues.status','!=','in-progress')->leftJoin('issues','issues.assignee_id','=','users.id')->get();
+        $allUsers = User::all();
+        if(auth()->user()->id === $issue->Issuer_Id || $user_info->role === 'admin' || $user_info->role === 'mod') {
+            return view('issues.edit',compact(['issue', 'id','idd','user_info','notAssigned','allUsers']));
         }
         return redirect('/project/'.$id.'/issue/')->with('error' , 'Unauthorized Page');
     }
@@ -146,6 +158,14 @@ class IssueController extends Controller
             $fileNameToStore = 'noimage.jpg';
         }
         $issue = Issue::find($idd);
+        if(!empty($request->input('assignee'))) {
+            $user = User::find($request->input('assignee'));
+            $issue->assignee_id = $request->input('assignee');
+            $issue->assignee = $user->name;
+        }
+        if($request->input('assignee') !== 'assigned' || $request->input('assignee') !== 'in-progress') {
+            $issue->assignee_idd = NULL;
+        }
         $issue->Name = $request->input('name');
         $issue->Description = $request->input('description');
         $issue->Picture = $fileNameToStore;
@@ -168,7 +188,8 @@ class IssueController extends Controller
         $issue = Issue::find($idd);
         $user_Info = User::find(auth()->user()->id);
         if(auth()->user()->id === $issue->Issuer_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod') {
-            
+            $comment = Comment::where('issue_Id',$idd);
+            $comment->delete();
             $issue->delete();
             return redirect('/project/'.$id.'/issue')->with('success','Issue is deleted');
         }        
