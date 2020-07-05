@@ -30,7 +30,9 @@ to update database use "php artisan migrate:fresh"
 <br><br>
 <p>make sure to do this to your vhosts file</p>
 <br>
-<VirtualHost *:80>
+VirtualHost *:80 
+<br>
   ServerName nmstracker.com
+  <br>
   DocumentRoot "${INSTALL_DIR}/www/nmstrackersystem/public"
-</VirtualHost>
+/VirtualHost
