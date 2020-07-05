@@ -35,4 +35,7 @@ VirtualHost *:80
   ServerName nmstracker.com
   <br>
   DocumentRoot "${INSTALL_DIR}/www/nmstrackersystem/public"
-/VirtualHost
+  <br>
+  for windows user edit your hosts file
+  127.0.0.1 localhost
+  127.0.0.1 nmstracker.com
