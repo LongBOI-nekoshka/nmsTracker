@@ -29,7 +29,7 @@ class PagesController extends Controller
     }
 
     public function assignedIssues() {
-        $assigneIssues = Issue::where('assignee_id',auth()->user()->id)->where('status','assigned')->orWhere('status','in-Progress')->get();
+        $assigneIssues = Issue::where('assignee_id',auth()->user()->id)->whereRaw('(status = "assigned" OR status = "in-Progress")')->get();
         return view('pages.assigned')->with('assigneIssues',$assigneIssues);
     }
 }

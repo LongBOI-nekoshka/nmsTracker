@@ -154,8 +154,6 @@ class IssueController extends Controller
             $extention = $request->file('picture')->getClientOriginalExtension();
             $fileNameToStore = $filename.'_'.time().'.'. $extention;
             $path = $request->file('picture')->storeAs('public/picture', $fileNameToStore);
-        }else {
-            $fileNameToStore = 'noimage.jpg';
         }
         $issue = Issue::find($idd);
         if(!empty($request->input('assignee'))) {
@@ -168,7 +166,9 @@ class IssueController extends Controller
         }
         $issue->Name = $request->input('name');
         $issue->Description = $request->input('description');
-        $issue->Picture = $fileNameToStore;
+        if ($request->hasFile('picture')) {
+            $issue->Picture = $fileNameToStore;
+        }
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');

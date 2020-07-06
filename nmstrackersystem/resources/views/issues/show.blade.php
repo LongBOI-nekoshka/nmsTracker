@@ -49,11 +49,13 @@
             <hr>
             <small>commented by: {{$comment->name}}</small>
             <h5>{{$comment->comment}}</h5>
-            @if(Auth::user()->id == $comment->id || $user_Info->role == 'admin' || $user_Info->role == 'mod')
-            {!!Form::open(['action' => ['CommentController@destroy',$id,$idd,$comment->comment_Id],'method'=>'POST'])!!}
-                {{Form::hidden('_method', 'DELETE')}}
-                {{Form::submit('Delete',['class'=>'btn btn-danger btn-sm'])}}
-            {!!Form::close()!!}
+            @if(!Auth::guest())
+                @if(Auth::user()->id == $comment->id || $user_Info->role == 'admin' || $user_Info->role == 'mod')
+                {!!Form::open(['action' => ['CommentController@destroy',$id,$idd,$comment->comment_Id],'method'=>'POST'])!!}
+                    {{Form::hidden('_method', 'DELETE')}}
+                    {{Form::submit('Delete',['class'=>'btn btn-danger btn-sm'])}}
+                {!!Form::close()!!}
+                @endif
             @endif
             <hr>
         @endforeach
