@@ -27,3 +27,18 @@ to update database use "php artisan migrate:fresh"
 <h3>RECAPTCHA_SITEKEY</h3>
 <h3>RECAPTCHA_SECRET</h3>
 <p><strong>remove ".example" in "env.example"</strong></p>
+<br><br>
+<p>make sure to do this to your vhosts file</p>
+<br>
+VirtualHost *:80 
+<br>
+  ServerName nmstracker.com
+  <br>
+  DocumentRoot "${INSTALL_DIR}/www/nmstrackersystem/public"
+  <br>
+  <br>
+  for windows user edit your hosts file
+  <br>
+  127.0.0.1 localhost
+  <br>
+  127.0.0.1 nmstracker.com
