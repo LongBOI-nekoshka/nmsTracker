@@ -43,23 +43,23 @@
                     @if($user_info->role == 'user')
                         <div id="assignee" class="form-group" style="display: none">
                             <br>
-                            {{Form::label('assignee','Select an Assignee')}}
+                            {{Form::label('assignees','Select an Assignee')}}
                             @foreach ($notAssigned as $noAssigned)
                                 <br>
                                 {{Form::radio('assignee',$noAssigned->id,false,['id'=>'asgn'])}}
-                                {{Form::label('Assignee ID',$noAssigned->id)}}
-                                {{Form::label('Assignee Name',$noAssigned->name)}}
+                                {{Form::label('AssigneeID',$noAssigned->id)}}
+                                {{Form::label('AssigneeName',$noAssigned->name)}}
                             @endforeach
                         </div>
                     @else
                         <div id="assignee" class="form-group" style="display: none">
                             <br>
-                            {{Form::label('assignee','Select an Assignee')}}
+                            {{Form::label('assignees','Select an Assignee')}}
                             @foreach ($allUsers as $user)
                                 <br>
                                 {{Form::radio('assignee',$user->id,false,['id'=>'asgn'])}}
-                                {{Form::label('Assignee Name',$user->id)}}
-                                {{Form::label('Assignee ID',$user->name)}}
+                                {{Form::label('AssigneeName',$user->id)}}
+                                {{Form::label('AssigneeID',$user->name)}}
                             @endforeach
                         </div>
                     @endif
@@ -76,10 +76,11 @@
                 {{Form::file('picture')}}
             </div>
             {{Form::hidden('secret',$project_Id->Project_Id)}}
-            <div class="g-recaptcha" data-sitekey="{{env('RECAPTCHA_SITEKEY')}}">
-            </div>
+            @if(Auth::guest())
+                <div class="g-recaptcha" data-sitekey="{{env('RECAPTCHA_SITEKEY')}}"></div>             
+            @endif
             <br>
-            {{Form::submit('Submit',['class' => 'btn btn-primary'])}}
+            {{Form::submit('Submit',['class' => 'btn btn-primary', 'id' => 'submit'])}}
         {!! Form::close() !!}
     </div>
 @endsection
@@ -92,6 +93,5 @@
             document.getElementById("assignee").style.display = 'none';
             document.getElementById("asgn").checked = false;
         }
-        
     }
 </script>

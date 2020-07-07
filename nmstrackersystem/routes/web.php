@@ -18,7 +18,7 @@ Route::get('/showAllIssues', 'PagesController@showAllIssues');
 Route::get('/assignedIssues', 'PagesController@assignedIssues');
 Route::resource('/project', 'ProjectController');
 Route::resource('/project/{project}/issue', 'IssueController');
-Route::resource('/project/{project}/issue/{issue}/comment', 'CommentController',['only'=>['store','update','destroy']]);
+Route::resource('/project/{project}/issue/{issue}/comment', 'CommentController',['only'=>['store','destroy']]);
 Route::resource('admin','AdminController',['only'=>['index','update']]);
 Auth::routes();
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');

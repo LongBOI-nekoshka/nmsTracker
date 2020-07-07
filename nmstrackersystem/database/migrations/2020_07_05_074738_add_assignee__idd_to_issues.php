@@ -14,7 +14,7 @@ class AddAssigneeIddToIssues extends Migration
     public function up()
     {
         Schema::table('issues', function (Blueprint $table) {
-            $table->integer('assignee_Idd')->nullable();
+            $table->bigInteger('assignee_Idd')->nullable();
             //
         });
     }

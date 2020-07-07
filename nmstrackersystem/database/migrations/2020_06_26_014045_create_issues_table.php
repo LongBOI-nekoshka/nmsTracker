@@ -20,8 +20,8 @@ class CreateIssuesTable extends Migration
             $table->string('Email')->nullable();
             $table->string('Priority');
             $table->string('Picture')->nullable();
-            $table->integer('Project_Id');
-            $table->integer('Issuer_Id')->nullable();
+            $table->bigInteger('Project_Id')->unsigned();
+            $table->bigInteger('Issuer_Id')->nullable();
             $table->timestamps();
         });
     }

@@ -15,7 +15,7 @@ class AddUserIdToProjects extends Migration
     {
         Schema::table('projects', function (Blueprint $table) {
             //
-            $table->integer('user_id');
+            $table->bigInteger('user_id');
         });
     }
 
