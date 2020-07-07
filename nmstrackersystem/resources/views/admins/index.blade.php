@@ -2,7 +2,10 @@
 
 @section('content')
     <div class="jumbotron">
-        <table class="table text-center">
+        <div class="form-group col-md-3">
+            <input type="text" class="form-control" onkeyup="myFunction()" placeholder="Search User Type Name or ID" id="myInput">
+        </div>
+        <table class="table text-center" id="myTable">
             <thead>
                 <tr class="bg-warning">
                     <th scope="col">User ID</th>
@@ -34,3 +37,35 @@
         </table>
     </div>
 @endsection
+<script>
+    function myFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for(i = 0; i < tr.length; i++) {
+            if(isNaN(input.value)) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if(td) {
+                    txtValue = td.textContent || td.innerText;
+                    if(txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    }else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }else {
+                td = tr[i].getElementsByTagName("td")[0];
+                if(td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    }else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+</script>

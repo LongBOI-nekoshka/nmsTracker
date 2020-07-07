@@ -42,7 +42,7 @@ class IssueController extends Controller
             return view('issues.create')->with('project_Id',$project_Id);
         }
         $user_info = User::find(auth()->user()->id);
-        $notAssigned = User::whereNull('issues.assignee_Idd')->leftJoin('issues','issues.assignee_Idd','=','users.id')->paginate(5);
+        $notAssigned = User::whereNull('issues.assignee_Idd')->leftJoin('issues','issues.assignee_Idd','=','users.id')->get();
         $allUsers = User::where('role','!=','disabled')->get();
         return view('issues.create',compact('project_Id','user_info','notAssigned','allUsers'));
     }

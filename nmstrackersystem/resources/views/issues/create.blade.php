@@ -43,24 +43,36 @@
                     @if($user_info->role == 'user')
                         <div id="assignee" class="form-group" style="display: none">
                             <br>
-                            {{Form::label('assignees','Select an Assignee')}}
-                            @foreach ($notAssigned as $noAssigned)
-                                <br>
-                                {{Form::radio('assignee',$noAssigned->id,false,['id'=>'asgn'])}}
-                                {{Form::label('AssigneeID',$noAssigned->id)}}
-                                {{Form::label('AssigneeName',$noAssigned->name)}}
-                            @endforeach
+                            <div class="form-group col-md-3">
+                                <input type="text" class="form-control" onkeyup="myFunction()" placeholder="Search User Type Name or ID" id="myInput">
+                            </div>
+                            <div id="tableLike">
+                                {{Form::label('assignees','Select an Assignee')}}
+                                @foreach ($notAssigned as $noAssigned)
+                                    <div class="trLike form-group">
+                                        {{Form::radio('assignee',$noAssigned->id,false,['id'=>'asgn'])}}
+                                        {{Form::label('AssigneeID',$noAssigned->id)}}
+                                        {{Form::label('AssigneeName',$noAssigned->name)}}
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @else
                         <div id="assignee" class="form-group" style="display: none">
                             <br>
-                            {{Form::label('assignees','Select an Assignee')}}
-                            @foreach ($allUsers as $user)
-                                <br>
-                                {{Form::radio('assignee',$user->id,false,['id'=>'asgn'])}}
-                                {{Form::label('AssigneeName',$user->id)}}
-                                {{Form::label('AssigneeID',$user->name)}}
-                            @endforeach
+                            <div class="form-group col-md-3">
+                                <input type="text" class="form-control" onkeyup="myFunction()" placeholder="Search User Type Name or ID" id="myInput">
+                            </div>
+                            <div id="tableLike">
+                                {{Form::label('assignees','Select an Assignee')}}
+                                @foreach ($allUsers as $user)
+                                    <div class="trLike form-group">
+                                        {{Form::radio('assignee',$user->id,false,['id'=>'asgn'])}}
+                                        {{Form::label('AssigneeName',$user->id)}}
+                                        {{Form::label('AssigneeID',$user->name)}}
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 @endif
@@ -92,6 +104,36 @@
         }else {
             document.getElementById("assignee").style.display = 'none';
             document.getElementById("asgn").checked = false;
+        }
+    }
+    function myFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("tableLike");
+        tr = table.getElementsByClassName("trLike");
+        for(i = 0; i < tr.length; i++) {
+            if(input.value.match(/^[0-9]+$/)) {
+                td = tr[i].getElementsByTagName("label")[0];
+                if(td) {
+                    txtValue = td.textContent || td.innerText;
+                    if(txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    }else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }else {
+                td = tr[i].getElementsByTagName("label")[1];
+                if(td) {
+                    txtValue = td.textContent || td.innerText;
+                    if(txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    }else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
         }
     }
 </script>
