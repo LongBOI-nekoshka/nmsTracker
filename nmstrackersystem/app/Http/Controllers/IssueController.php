@@ -55,6 +55,7 @@ class IssueController extends Controller
      */
     public function store(Request $request)
     {
+
         // if(empty(auth()->user())) {
         //     $this->validate($request, [
         //         'name'=>'required',
@@ -67,14 +68,30 @@ class IssueController extends Controller
         //     $this->validate($request, [
         //         'name'=>'required',
         //         'description'=>'required',
+        //         'picture' => 'image|nullable|max:1999',
         //         'assignee' => 'required',
         //     ]);
         // }
         // $this->validate($request, [
         //     'name'=>'required',
         //     'description'=>'required',
+        //     'picture' => 'image|nullable|max:1999',
         // ]);
-        
+        if(!empty($_FILES)) {
+            for($i = 0; $i < sizeof($_FILES); $i++) {
+                $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                $extention = $request->file('file'.$i)->getClientOriginalExtension();
+                preg_match_all('/{(.*?)}/', $request->input('description'), $match);
+                foreach ($match[1] as $key) {
+                    $replace = str_replace($key,$filename.time().'.'.$extention,$match[1]);
+                }
+                print_r($replace);
+            }
+            
+           
+            
+        }
         // if($request->hasFile('picture')) {
         //     $fileNameWithExt = $request->file('picture')->getClientOriginalName();
         //     $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);

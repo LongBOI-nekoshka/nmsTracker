@@ -204,7 +204,7 @@ $( document ).ready(function() {
         });
     }
     $('#sendIssue').on('submit', function(event) {
-        // event.preventDefault();
+        event.preventDefault();
         var data = $(this).serialize();
         var formData = new FormData(this);
         if(arrayFiles.length == 0) {

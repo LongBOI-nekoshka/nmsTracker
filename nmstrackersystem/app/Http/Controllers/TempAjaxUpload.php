@@ -19,6 +19,7 @@ class TempAjaxUpload extends Controller
             print_r($fileNameToStore);
         }
     }
+    
     public function save(Request $request) {
         print_r($_FILES);
         // $rawText = $request->input('moreInfo');
