@@ -78,19 +78,17 @@ class IssueController extends Controller
         //     'picture' => 'image|nullable|max:1999',
         // ]);
         if(!empty($_FILES)) {
+            $search = strtr($request->input('description'), array('{' => '<p><img style="width:30%" src="/storage/picture/', '}' => '"></p>'));
             for($i = 0; $i < sizeof($_FILES); $i++) {
                 $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
                 $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
                 $extention = $request->file('file'.$i)->getClientOriginalExtension();
                 preg_match_all('/{(.*?)}/', $request->input('description'), $match);
                 foreach ($match[1] as $key) {
-                    $replace = str_replace($key,$filename.time().'.'.$extention,$match[1]);
+                    $replace = str_replace($key,$filename.time().'.'.$extention,$search);
                 }
-                print_r($replace);
             }
-            
-           
-            
+            print_r($replace);
         }
         // if($request->hasFile('picture')) {
         //     $fileNameWithExt = $request->file('picture')->getClientOriginalName();
