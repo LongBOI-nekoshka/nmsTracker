@@ -55,60 +55,58 @@ class IssueController extends Controller
      */
     public function store(Request $request)
     {
-        if(empty(auth()->user())) {
-            $this->validate($request, [
-                'name'=>'required',
-                'description'=>'required',
-                'g-recaptcha-response' => 'required',
-                'picture' => 'image|nullable|max:1999',
-            ]);
-        }
-        if($request->input('status') == 'assigned' || $request->input('status') == 'In-Progress') {
-            $this->validate($request, [
-                'name'=>'required',
-                'description'=>'required',
-                'picture' => 'image|nullable|max:1999',
-                'assignee' => 'required',
-            ]);
-        }
-        $this->validate($request, [
-            'name'=>'required',
-            'description'=>'required',
-            'picture' => 'image|nullable|max:1999',
-        ]);
+        // if(empty(auth()->user())) {
+        //     $this->validate($request, [
+        //         'name'=>'required',
+        //         'description'=>'required',
+        //         'g-recaptcha-response' => 'required',
+        //         'picture' => 'image|nullable|max:1999',
+        //     ]);
+        // }
+        // if($request->input('status') == 'assigned' || $request->input('status') == 'In-Progress') {
+        //     $this->validate($request, [
+        //         'name'=>'required',
+        //         'description'=>'required',
+        //         'assignee' => 'required',
+        //     ]);
+        // }
+        // $this->validate($request, [
+        //     'name'=>'required',
+        //     'description'=>'required',
+        // ]);
         
-        if($request->hasFile('picture')) {
-            $fileNameWithExt = $request->file('picture')->getClientOriginalName();
-            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            $extention = $request->file('picture')->getClientOriginalExtension();
-            $fileNameToStore = $filename.'_'.time().'.'. $extention;
-            $path = $request->file('picture')->storeAs('public/picture', $fileNameToStore);
-        }else {
-            $fileNameToStore = 'noimage.jpg';
-        }
-        $issue = new Issue;
-        if(!empty(auth()->user())) {
-            $user_email = User::find(auth()->user()->id);
-            $issue->Issuer_Id = auth()->user()->id;
-            $issue->Email = $user_email->email;
-        }else {
-            $issue->Email = $request->input('email');
-        }
-        if(!empty($request->input('assignee'))) {
-            $user = User::find($request->input('assignee'));
-            $issue->assignee_id = $request->input('assignee');
-            $issue->assignee_idd = $request->input('assignee');
-            $issue->assignee = $user->name;
-        }
-        $issue->Picture = $fileNameToStore;
-        $issue->Name = $request->input('name');
-        $issue->Description = $request->input('description');
-        $issue->Priority = $request->input('priority');
-        $issue->tracker = $request->input('tracker');
-        $issue->status = $request->input('status');
-        $issue->Project_Id = $request->input('secret');
-        $issue->save();
-        return redirect('/project/'.$request->input('secret').'/issue')->with('success', 'Issue have been submited');
+        // if($request->hasFile('picture')) {
+        //     $fileNameWithExt = $request->file('picture')->getClientOriginalName();
+        //     $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        //     $extention = $request->file('picture')->getClientOriginalExtension();
+        //     $fileNameToStore = $filename.'_'.time().'.'. $extention;
+        //     $path = $request->file('picture')->storeAs('public/picture', $fileNameToStore);
+        // }else {
+        //     $fileNameToStore = 'noimage.jpg';
+        // }
+        // $issue = new Issue;
+        // if(!empty(auth()->user())) {
+        //     $user_email = User::find(auth()->user()->id);
+        //     $issue->Issuer_Id = auth()->user()->id;
+        //     $issue->Email = $user_email->email;
+        // }else {
+        //     $issue->Email = $request->input('email');
+        // }
+        // if(!empty($request->input('assignee'))) {
+        //     $user = User::find($request->input('assignee'));
+        //     $issue->assignee_id = $request->input('assignee');
+        //     $issue->assignee_idd = $request->input('assignee');
+        //     $issue->assignee = $user->name;
+        // }
+        // $issue->Picture = $fileNameToStore;
+        // $issue->Name = $request->input('name');
+        // $issue->Description = $request->input('description');
+        // $issue->Priority = $request->input('priority');
+        // $issue->tracker = $request->input('tracker');
+        // $issue->status = $request->input('status');
+        // $issue->Project_Id = $request->input('secret');
+        // $issue->save();
+        // return redirect('/project/'.$request->input('secret').'/issue')->with('success', 'Issue have been submited');
     }
 
     /**
@@ -117,8 +115,7 @@ class IssueController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id,$idd)
-    {
+    public function show($id,$idd) {
         $comments = Comment::where('comments.issue_Id',$idd)->rightjoin('users','users.id','=','comments.user_id')->get();
         $issue = Issue::where('Issue_Id',$idd)->get();
         if(!empty(auth()->user())) {
@@ -177,20 +174,24 @@ class IssueController extends Controller
             $fileNameToStore = $filename.'_'.time().'.'. $extention;
             $path = $request->file('picture')->storeAs('public/picture', $fileNameToStore);
         }
+
         $issue = Issue::find($idd);
         if(!empty($request->input('assignee'))) {
             $user = User::find($request->input('assignee'));
             $issue->assignee_id = $request->input('assignee');
             $issue->assignee = $user->name;
         }
+
         if($request->input('assignee') !== 'assigned' || $request->input('assignee') !== 'in-progress') {
             $issue->assignee_idd = NULL;
         }
+
         $issue->Name = $request->input('name');
         $issue->Description = $request->input('description');
         if ($request->hasFile('picture')) {
             $issue->Picture = $fileNameToStore;
         }
+        
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');

@@ -1,13 +1,26 @@
 @extends('layouts.app')
 @extends('includes.recapcha3')
-
+<script
+        src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous">
+</script>
+<style>
+    .editor {
+        width: 900px;
+        height: 300px;
+        border: 1px solid #ccc;
+    }
+</style>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
     <div class="container">
         <a href="/project/{{$project_Id->Project_Id}}" class="btn btn-secondary">Go Back</a>
         <br>
         <br>
         <h4>Create Issue</h4>
-        {!! Form::open(['action' => ['IssueController@store',$project_Id->Project_Id], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+        <!--   -->
+        {!! Form::open(['action' => ['IssueController@store',$project_Id->Project_Id], 'method' => 'POST','id'=>'sendIssue','files' => true,'enctype' => 'multipart/form-data']) !!}
             <div class="form-group">
                 {{Form::label('name','Name')}}
                 {{Form::text('name','',['class' => 'form-control','placeholder' => 'Name of Issue'])}}
@@ -83,17 +96,18 @@
             </div>
             <div class="form-group">
                 {{Form::label('description','Description')}}
-                {{Form::textarea('description','',['class' => 'form-control','rows' =>'4','cols' => '11'])}}
+                {{Form::textarea('description','',['class' => 'form-control', 'id' => 'ta','rows' =>'4','cols' => '11'])}}
                 <br>
-                {{Form::file('picture')}}
+                {{Form::file('[]',['id' => 'manualUpload','class' => 'form-control-file','multiple' => 'multiple'])}}
             </div>
             {{Form::hidden('secret',$project_Id->Project_Id)}}
             @if(Auth::guest())
-                <div class="g-recaptcha" data-sitekey="{{env('RECAPTCHA_SITEKEY')}}"></div>             
+                <div class="g-recaptcha" data-sitekey="6LccBqwZAAAAAIKQt2sSvHoybs5_ifEgAuW9xGER"></div>             
             @endif
             <br>
             {{Form::submit('Submit',['class' => 'btn btn-primary', 'id' => 'submit'])}}
         {!! Form::close() !!}
+        
     </div>
 @endsection
 <script>
@@ -136,4 +150,99 @@
             }
         }
     }
+</script>
+<script>
+$( document ).ready(function() {
+    var arrayFiles = [];
+    var dropzone = document.getElementById('ta');
+    var manualUpload = document.getElementById('manualUpload');
+    dropzone.ondrop = function(e) {
+        e.preventDefault();
+        readfiles(e.dataTransfer.files);
+        // $("input[type='file']").prop("files", e.dataTransfer.files);
+    };
+
+    manualUpload.onchange = function(e) {
+        readfiles(manualUpload.files);
+    }
+
+    window.onload = function() {
+     document.getElementById("ta").addEventListener("paste", handlePaste);
+    };
+
+    function handlePaste(e) {
+        if(e.clipboardData.files.length != 0) {
+            const dT = e.clipboardData || window.clipboardData;
+            const file = dT.files;
+            readfiles(file);
+        }
+    }
+    
+    function readfiles(files) {
+        var formData = new FormData();
+        if(typeof files.length !== 'undefined') {
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file'+i, files[i]);
+                arrayFiles.push(files[i]);
+            }
+        }
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            async: true,
+            success: function (data) {
+                var message = $("#ta").val();
+                $("#ta").val(message + ''+data);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    $('#sendIssue').on('submit', function(event) {
+        // event.preventDefault();
+        var data = $(this).serialize();
+        var formData = new FormData(this);
+        if(arrayFiles.length == 0) {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/project/{$project_Id->Project_Id}/issue',
+                type: 'POST',
+                data:  formData,
+                async: true,
+                success: function (data) {
+                    console.log(data);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }else {
+            for (var i = 0; i < arrayFiles.length; i++) {
+                formData.append('file'+i, arrayFiles[i]);
+            }
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/project/{$project_Id->Project_Id}/issue',
+                type: 'POST',
+                data: formData,
+                async: true,
+                success: function (data) {
+                    console.log(data);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    });
+});
 </script>
