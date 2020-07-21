@@ -128,6 +128,7 @@ class IssueController extends Controller
             $issue->tracker = $request->input('tracker');
             $issue->status = $request->input('status');
             $issue->Project_Id = $request->input('secret');
+            $issue->save();
         }
         
         
