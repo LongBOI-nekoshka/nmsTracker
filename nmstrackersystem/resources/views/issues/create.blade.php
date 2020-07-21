@@ -182,9 +182,14 @@ $( document ).ready(function() {
         var formData = new FormData();
         if(typeof files.length !== 'undefined') {
             for (var i = 0; i < files.length; i++) {
-                formData.append('file'+i, files[i]);
                 arrayFiles.push(files[i]);
+                formData.append('file'+i, files[i],files[i]['name'].split('.').slice(0, -1).join('.')+arrayFiles.length);
             }
+            Object.defineProperty(arrayFiles[arrayFiles.length-1], 'name', {
+                    writable: true,
+                    value: arrayFiles[arrayFiles.length-1]['name'].split('.').slice(0, -1).join('.')+arrayFiles.length+'.'+arrayFiles[arrayFiles.length-1]['name'].split('.').pop(),
+            });
+            console.log(arrayFiles);
         }
         $.ajax({
             headers: {
@@ -204,7 +209,7 @@ $( document ).ready(function() {
         });
     }
     $('#sendIssue').on('submit', function(event) {
-        event.preventDefault();
+        // event.preventDefault();
         var data = $(this).serialize();
         var formData = new FormData(this);
         if(arrayFiles.length == 0) {

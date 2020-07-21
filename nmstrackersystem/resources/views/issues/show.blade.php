@@ -5,11 +5,11 @@
         <a href="/project/{{$id}}/issue/" class="btn btn-secondary">Go Back</a>
         <br><br>
         @foreach ($issue as $isInfo)
-            <img style="width:30%" src="/storage/picture/{{$isInfo->Picture}}">
+            {{-- <img style="width:30%" src="/storage/picture/{{$isInfo->Picture}}"> --}}
             <br><br>
             <h4>Title: {{$isInfo->Name}}</h4>
             <br>
-            <p>Description: {{$isInfo->Description}}</p>
+            <p>Description: {!!$isInfo->Description!!}</p>
             @if(!Auth::guest())
                 @if (Auth::user()->id === $isInfo->Issuer_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod')
                     <hr>
