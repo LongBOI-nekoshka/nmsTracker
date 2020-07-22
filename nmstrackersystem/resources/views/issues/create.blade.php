@@ -20,7 +20,7 @@
         <br>
         <h4>Create Issue</h4>
         <!--   -->
-        {!! Form::open(['action' => ['IssueController@store',$project_Id->Project_Id], 'method' => 'POST','id'=>'sendIssue','files' => true,'enctype' => 'multipart/form-data']) !!}
+        {!! Form::open(['id'=>'sendIssue','files' => true,'enctype' => 'multipart/form-data']) !!}
             <div class="form-group">
                 {{Form::label('name','Name')}}
                 {{Form::text('name','',['class' => 'form-control','placeholder' => 'Name of Issue'])}}
@@ -156,10 +156,11 @@ $( document ).ready(function() {
     var arrayFiles = [];
     var dropzone = document.getElementById('ta');
     var manualUpload = document.getElementById('manualUpload');
+    const pictureOnly = ["image/gif", "image/jpeg", "image/png"];
+    var check;
     dropzone.ondrop = function(e) {
         e.preventDefault();
         readfiles(e.dataTransfer.files);
-        // $("input[type='file']").prop("files", e.dataTransfer.files);
     };
 
     manualUpload.onchange = function(e) {
@@ -182,14 +183,20 @@ $( document ).ready(function() {
         var formData = new FormData();
         if(typeof files.length !== 'undefined') {
             for (var i = 0; i < files.length; i++) {
-                arrayFiles.push(files[i]);
-                formData.append('file'+i, files[i],files[i]['name'].split('.').slice(0, -1).join('.')+arrayFiles.length);
+                if(!pictureOnly.includes(files[i]['type'])) {
+                    check = true;
+                    alert(files[i]['name']+' is not a picture is a '+files[i]['type']);
+                } else {
+                    arrayFiles.push(files[i]);
+                    formData.append('file'+i, files[i],files[i]['name'].split('.').slice(0, -1).join('.')+arrayFiles.length);
+                }
             }
-            Object.defineProperty(arrayFiles[arrayFiles.length-1], 'name', {
+            if(check != true) {
+                Object.defineProperty(arrayFiles[arrayFiles.length-1], 'name', {
                     writable: true,
                     value: arrayFiles[arrayFiles.length-1]['name'].split('.').slice(0, -1).join('.')+arrayFiles.length+'.'+arrayFiles[arrayFiles.length-1]['name'].split('.').pop(),
-            });
-            console.log(arrayFiles);
+                });
+            }
         }
         $.ajax({
             headers: {
@@ -201,7 +208,7 @@ $( document ).ready(function() {
             async: true,
             success: function (data) {
                 var message = $("#ta").val();
-                $("#ta").val(message + ''+data);
+                $("#ta").val(message+''+data);
             },
             cache: false,
             contentType: false,
@@ -209,7 +216,6 @@ $( document ).ready(function() {
         });
     }
     $('#sendIssue').on('submit', function(event) {
-        // event.preventDefault();
         var data = $(this).serialize();
         var formData = new FormData(this);
         if(arrayFiles.length == 0) {
@@ -221,7 +227,7 @@ $( document ).ready(function() {
                 type: 'POST',
                 data:  formData,
                 async: true,
-                success: function (data) {
+                success: function (res) {
                     console.log(data);
                 },
                 cache: false,

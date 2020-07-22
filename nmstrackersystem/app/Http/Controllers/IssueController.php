@@ -76,18 +76,34 @@ class IssueController extends Controller
 
         $issue = new Issue;
         $search = strtr($request->input('description'), array('{--' => '<p><img style="width:40%" src="/storage/picture/', '--}' => '"></p>'));
+        preg_match_all('/{--(.*?)--}/', $request->input('description'), $match);
+        
+        if(!empty(auth()->user())) {
+            $user_email = User::find(auth()->user()->id);
+            $issue->Issuer_Id = auth()->user()->id;
+            $issue->Email = $user_email->email;
+        }else {
+            $issue->Email = $request->input('email');
+        }
+        if(!empty($request->input('assignee'))) {
+            $user = User::find($request->input('assignee'));
+            $issue->assignee_id = $request->input('assignee');
+            $issue->assignee_idd = $request->input('assignee');
+            $issue->assignee = $user->name;
+        }
+        if(empty($match[1])) {
+            $_FILES = [];
+        }
         if(!empty($_FILES)) {
             $temp = array();
             $temphtml = array();
             $word = array();
-            // if one line element check 
-            preg_match_all('/{--(.*?)--}/', $request->input('description'), $match);
             for($i = 0; $i < sizeof($_FILES); $i++) {
                 $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
                 $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
                 $extention = $request->file('file'.$i)->getClientOriginalExtension();
                 $fileNameToStore = $filename.'_'.time().'.'. $extention;
-                $path = $request->file('file'.$i)->storeAs('public/picture', $fileNameToStore);
+                
                 foreach ($match[1] as $key) {
                     $keys = str_replace($key,$fileNameToStore,$key);
                     $replace = str_replace($key,$fileNameToStore,$search);
@@ -96,43 +112,28 @@ class IssueController extends Controller
                 array_push($temp,$keys);
                 array_push($temphtml,$replace);
             }
-            for($j = 0; $j < sizeof($temphtml); $j++) {
-                $temphtml[sizeof($temphtml)-1] = strtr($temphtml[sizeof($temphtml)-1],array(array_unique($word)[$j] => $temp[$j]));
-            }
-            print_r($temphtml);
-            $issue->Name = $request->input('name');
-            $issue->Description = $temphtml[sizeof($temphtml)-1];
-            $issue->Priority = $request->input('priority');
-            $issue->tracker = $request->input('tracker');
-            $issue->status = $request->input('status');
-            $issue->Project_Id = $request->input('secret');
-            if(!empty(auth()->user())) {
-                $user_email = User::find(auth()->user()->id);
-                $issue->Issuer_Id = auth()->user()->id;
-                $issue->Email = $user_email->email;
+            $arrEnique = array_unique($word);
+
+            if(sizeof($arrEnique) == sizeof($temp)) {
+                for($j = 0; $j < sizeof($temphtml); $j++) {
+                    $temphtml[sizeof($temphtml)-1] = strtr($temphtml[sizeof($temphtml)-1],array(array_unique($word)[$j] => $temp[$j]));
+                    $issue->Description = $temphtml[sizeof($temphtml)-1];
+                    $path = $request->file('file'.$j)->storeAs('public/picture', $temp[$j]);
+                }
             }else {
-                $issue->Email = $request->input('email');
+                $_FILES = [];
             }
-            if(!empty($request->input('assignee'))) {
-                $user = User::find($request->input('assignee'));
-                $issue->assignee_id = $request->input('assignee');
-                $issue->assignee_idd = $request->input('assignee');
-                $issue->assignee = $user->name;
-            }
-            $issue->save();
         }
         if(empty($_FILES)) {
-            $issue->Name = $request->input('name');
             $issue->Description = $request->input('description');
-            $issue->Priority = $request->input('priority');
-            $issue->tracker = $request->input('tracker');
-            $issue->status = $request->input('status');
-            $issue->Project_Id = $request->input('secret');
-            $issue->save();
         }
-        
-        
-        return redirect('/project/'.$request->input('secret').'/issue')->with('success', 'Issue have been submited');
+        $issue->Name = $request->input('name');
+        $issue->Priority = $request->input('priority');
+        $issue->tracker = $request->input('tracker');
+        $issue->status = $request->input('status');
+        $issue->Project_Id = $request->input('secret');
+        $issue->save();
+        return redirect('/project/'.$request->input('secret').'/issue');
     }
 
     /**

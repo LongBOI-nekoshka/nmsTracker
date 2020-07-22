@@ -14,9 +14,12 @@ class TempAjaxUpload extends Controller
         for($i = 0; $i < count($_FILES); $i++) {
             $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            $extention = $request->file('file'.$i)->getClientOriginalExtension();
-            $fileNameToStore = '{--'.$filename.'.'.$extention.'--}';
+            $fileNameToStore = '{--'.$filename.'--}';
             print_r($fileNameToStore);
         }
+    }
+    public function redirect(Request $request)
+    {
+        return redirect('/project/'.$request->input('secret').'/issue');
     }
 }
