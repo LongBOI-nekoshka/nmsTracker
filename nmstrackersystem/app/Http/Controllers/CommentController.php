@@ -46,13 +46,49 @@ class CommentController extends Controller
         $this->validate($request, [
             'comment'=>'required',
         ]);
-
         $comment = new Comment;
-        $comment->comment = $request->input('comment');
         $comment->user_id = auth()->user()->id;
         $comment->issue_id = $request->input('issue_id');
+        $search = strtr($request->input('comment'), array('{--' => '<p><img style="width:25%" src="/storage/picture/', '--}' => '"></p>'));
+        preg_match_all('/{--(.*?)--}/', $request->input('comment'), $match);
+        if(empty($match[1])) {
+            $_FILES = [];
+        }
+        if(!empty($_FILES)) {
+            $temp = array();
+            $temphtml = array();
+            $word = array();
+            for($i = 0; $i < sizeof($_FILES); $i++) {
+                $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                $extention = $request->file('file'.$i)->getClientOriginalExtension();
+                $fileNameToStore = $filename.'_'.time().'.'. $extention;
+                foreach ($match[1] as $key) {
+                    $keys = str_replace($key,$fileNameToStore,$key);
+                    $replace = str_replace($key,$fileNameToStore,$search);
+                    array_push($word,$key);
+                }
+                array_push($temp,$keys);
+                array_push($temphtml,$replace);
+            }
+            $arrEnique = array_unique($word);
+            if(sizeof($arrEnique) == sizeof($temp)) {
+                for($j = 1; $j < sizeof($temphtml); $j++) {
+                    $temphtml[sizeof($temphtml)-1] = strtr($temphtml[sizeof($temphtml)-1],array(array_unique($word)[$j-1] => $temp[$j-1]));
+                }
+                for($k = 0; $k < sizeof($temp); $k++) {
+                    $path = $request->file('file'.$k)->storeAs('public/picture', $temp[$k]);
+                }
+                $comment->comment = $temphtml[sizeof($temphtml)-1];
+            }else {
+                $_FILES = [];
+            }
+        }
+        if(empty($_FILES)) {
+            $comment->comment = $request->input('comment');
+        }
         $comment->save();
-        return redirect('/project/'.$request->input('project_id').'/issue/'.$request->input('issue_id'));
+        return response()->json(['url'=>'/project/'.$request->input('project_id').'/issue/'.$request->input('issue_id')]);
     }
 
     /**

@@ -5,13 +5,6 @@
         integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
         crossorigin="anonymous">
 </script>
-<style>
-    .editor {
-        width: 900px;
-        height: 300px;
-        border: 1px solid #ccc;
-    }
-</style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
     <div class="container">
@@ -229,7 +222,7 @@ $( document ).ready(function() {
                 data:  formData,
                 async: true,
                 success: function (res) {
-                    window.location=res.url;
+                    window.location = res.url;
                 },
                 cache: false,
                 contentType: false,
@@ -237,7 +230,7 @@ $( document ).ready(function() {
             });
         }else {
             for (var i = 0; i < arrayFiles.length; i++) {
-                formData.append('file'+i, arrayFiles[i]);
+                formData.append('file'+i, arrayFiles[i],arrayFiles[i]['name'].split('.').slice(0, -1).join('.')+'.'+arrayFiles[i]['name'].split('.').pop());
             }
             $.ajax({
                 headers: {
@@ -248,7 +241,11 @@ $( document ).ready(function() {
                 data: formData,
                 async: true,
                 success: function (res) {
-                    window.location=res.url;
+                    window.location = res.url;
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown){
+                    alert('file is large');
+                    window.location = '/project/{{$project_Id->Project_Id}}/issue/create'
                 },
                 cache: false,
                 contentType: false,

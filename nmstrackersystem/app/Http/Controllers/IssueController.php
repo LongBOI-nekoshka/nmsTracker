@@ -75,9 +75,8 @@ class IssueController extends Controller
         ]);
 
         $issue = new Issue;
-        $search = strtr($request->input('description'), array('{--' => '<p><img style="width:40%" src="/storage/picture/', '--}' => '"></p>'));
+        $search = strtr($request->input('description'), array('{--' => '<p><img style="width:30%" src="/storage/picture/', '--}' => '"></p>'));
         preg_match_all('/{--(.*?)--}/', $request->input('description'), $match);
-        
         if(!empty(auth()->user())) {
             $user_email = User::find(auth()->user()->id);
             $issue->Issuer_Id = auth()->user()->id;
@@ -103,7 +102,6 @@ class IssueController extends Controller
                 $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
                 $extention = $request->file('file'.$i)->getClientOriginalExtension();
                 $fileNameToStore = $filename.'_'.time().'.'. $extention;
-                
                 foreach ($match[1] as $key) {
                     $keys = str_replace($key,$fileNameToStore,$key);
                     $replace = str_replace($key,$fileNameToStore,$search);
@@ -113,13 +111,14 @@ class IssueController extends Controller
                 array_push($temphtml,$replace);
             }
             $arrEnique = array_unique($word);
-
             if(sizeof($arrEnique) == sizeof($temp)) {
-                for($j = 0; $j < sizeof($temphtml); $j++) {
-                    $temphtml[sizeof($temphtml)-1] = strtr($temphtml[sizeof($temphtml)-1],array(array_unique($word)[$j] => $temp[$j]));
-                    $issue->Description = $temphtml[sizeof($temphtml)-1];
-                    $path = $request->file('file'.$j)->storeAs('public/picture', $temp[$j]);
+                for($j = 1; $j < sizeof($temphtml); $j++) {
+                    $temphtml[sizeof($temphtml)-1] = strtr($temphtml[sizeof($temphtml)-1],array(array_unique($word)[$j-1] => $temp[$j-1]));
                 }
+                for($k = 0; $k < sizeof($temp); $k++) {
+                    $path = $request->file('file'.$k)->storeAs('public/picture', $temp[$k]);
+                }
+                $issue->Description = $temphtml[sizeof($temphtml)-1];
             }else {
                 $_FILES = [];
             }
@@ -134,7 +133,6 @@ class IssueController extends Controller
         $issue->Project_Id = $request->input('secret');
         $issue->save();
         return response()->json(['url'=>url('/project/'.$request->input('secret').'/issue')]);
-        // return redirect('/project/'.$request->input('secret').'/issue');
     }
 
     /**
@@ -144,7 +142,7 @@ class IssueController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id,$idd) {
-        $comments = Comment::where('comments.issue_Id',$idd)->rightjoin('users','users.id','=','comments.user_id')->get();
+        $comments = Comment::where('comments.issue_Id',$idd)->rightjoin('users','users.id','=','comments.user_id')->orderBy('comment_id','DESC')->get();
         $issue = Issue::where('Issue_Id',$idd)->get();
         if(!empty(auth()->user())) {
             $user_Info = User::find(auth()->user()->id);
