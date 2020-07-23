@@ -24,6 +24,8 @@ Auth::routes();
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('login/google', 'Auth\LoginController@redirectToProvider');
 Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');
+Route::post('/upload', 'TempAjaxUpload@post');
+Route::post('/save', 'TempAjaxUpload@save');
 // Route::get('/', function () {
 //     return view('welcome');
 // });

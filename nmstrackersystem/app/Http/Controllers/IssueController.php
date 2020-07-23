@@ -23,7 +23,7 @@ class IssueController extends Controller
     public function index($id)
     {
         //
-        $issues = Issue::where('Project_Id',$id)->get();
+        $issues = Issue::where('Project_Id',$id)->orderBy('Issue_Id','DESC')->get();
         $project = Project::where('Project_Id',$id)->get();
         // $columnList = DB::getSchemaBuilder()->getColumnListing('issues');
         return view('issues.index',compact(['project','issues']));
@@ -133,7 +133,8 @@ class IssueController extends Controller
         $issue->status = $request->input('status');
         $issue->Project_Id = $request->input('secret');
         $issue->save();
-        return redirect('/project/'.$request->input('secret').'/issue');
+        return response()->json(['url'=>url('/project/'.$request->input('secret').'/issue')]);
+        // return redirect('/project/'.$request->input('secret').'/issue');
     }
 
     /**

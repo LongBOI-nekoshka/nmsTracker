@@ -18,8 +18,4 @@ class TempAjaxUpload extends Controller
             print_r($fileNameToStore);
         }
     }
-    public function redirect(Request $request)
-    {
-        return redirect('/project/'.$request->input('secret').'/issue');
-    }
 }

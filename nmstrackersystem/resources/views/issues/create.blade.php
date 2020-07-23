@@ -216,6 +216,7 @@ $( document ).ready(function() {
         });
     }
     $('#sendIssue').on('submit', function(event) {
+        event.preventDefault();
         var data = $(this).serialize();
         var formData = new FormData(this);
         if(arrayFiles.length == 0) {
@@ -228,7 +229,7 @@ $( document ).ready(function() {
                 data:  formData,
                 async: true,
                 success: function (res) {
-                    console.log(data);
+                    window.location=res.url;
                 },
                 cache: false,
                 contentType: false,
@@ -246,8 +247,8 @@ $( document ).ready(function() {
                 type: 'POST',
                 data: formData,
                 async: true,
-                success: function (data) {
-                    console.log(data);
+                success: function (res) {
+                    window.location=res.url;
                 },
                 cache: false,
                 contentType: false,
