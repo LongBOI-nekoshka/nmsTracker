@@ -26,6 +26,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::orderBy('ProjectName','desc')->get();
+        
         return view('projects.project')->with('projects',$projects);
     }
 
@@ -71,8 +72,13 @@ class ProjectController extends Controller
     public function show($id)
     {
         //
-        $project = Project::find($id);
-        $owner = User::where('id',$project->user_id)->get();
+        try {
+            $project = Project::find($id);
+            $owner = User::where('id',$project->user_id)->get();
+        }catch(\Exception $e) {
+            $error = 404;
+            return response()->view('errors.custom',compact('error'));
+        }
         return view('projects.show',compact('project','owner'));
     }
 

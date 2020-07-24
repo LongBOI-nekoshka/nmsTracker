@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Comment;
 use App\User;
 use DB;
@@ -46,6 +47,7 @@ class CommentController extends Controller
         $this->validate($request, [
             'comment'=>'required',
         ]);
+
         $comment = new Comment;
         $comment->user_id = auth()->user()->id;
         $comment->issue_id = $request->input('issue_id');
@@ -58,6 +60,7 @@ class CommentController extends Controller
             $temp = array();
             $temphtml = array();
             $word = array();
+            $pictureNames = '';
             for($i = 0; $i < sizeof($_FILES); $i++) {
                 $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
                 $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -78,7 +81,9 @@ class CommentController extends Controller
                 }
                 for($k = 0; $k < sizeof($temp); $k++) {
                     $path = $request->file('file'.$k)->storeAs('public/picture', $temp[$k]);
+                    $pictureNames = $pictureNames.'{'.$temp[$k].'}';
                 }
+                $comment->Picture =  $pictureNames;
                 $comment->comment = $temphtml[sizeof($temphtml)-1];
             }else {
                 $_FILES = [];
@@ -137,7 +142,13 @@ class CommentController extends Controller
         $comment = Comment::find($iddd);
         $user_Info = User::find(auth()->user()->id);
         if(auth()->user()->id === $comment->user_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod') {
-            $comdel = DB::table('comments')->where('comment_Id',$iddd)->delete();
+            if(!empty($comment->Picture)) {
+                preg_match_all('/{(.*?)}/', $comment->Picture, $match);
+                foreach ($match[1] as $key) {
+                    Storage::delete('public/picture/'.$key);
+                }
+            }
+            DB::table('comments')->where('comment_Id',$iddd)->delete();
             return redirect('/project/'.$id.'/issue/'.$idd)->with('success','Comment is deleted');
         }
         return redirect('/project/'.$id.'/issue/'.$idd)->with('error', 'Unauthorize Page');

@@ -1,4 +1,4 @@
-{{-- <!doctype html>
+<!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -30,12 +30,15 @@
                     <a href="/" class="btn btn-outline-primary">Go back</a>
                     <br><br>
                     <small>a potato here's</small>
-                    <img src="https://lh3.googleusercontent.com/proxy/ukrQb5PfMca1lBoerk87M3434Nxz84vNgRIEVXEXEfGHUgEmff4dEshhGoPI7S7gvD0ln4Wd480RR__Qx01o1pI3frvTA-6aqdYGq3W6CgMuPDS9uhkiQLDVDmvrA05OKg7xhr0" alt="potatoes" width="28%">
+                    <img src="" alt="potatoes" width="28%">
                     <small>here's a potato</small>
+                    <br>
+                    <br>
+                    <small>potato is lost</small>
                 </div>
             </div>
         </main>
     </div>
 </body>
 </html>
- --}}
+

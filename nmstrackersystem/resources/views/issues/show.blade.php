@@ -1,16 +1,15 @@
 @extends('layouts.app')
-{{-- 
-    -Add picture column in comments table
-    -Learn websocket for realtime comments
-    -store all picture name in column picture
-    -when delete get image name and delete it from local file
-    -use blackets to get for regex to get it
- --}}
 <script
         src="https://code.jquery.com/jquery-3.5.1.js"
         integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
         crossorigin="anonymous">
 </script>
+<style>
+    h5 {
+     width: 550px;
+     overflow-wrap: break-word;
+    }
+</style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
     <div class="container">
@@ -55,8 +54,9 @@
                 <h4>Issue have been Closed</h4>
             @endif
         @endif
-        <div class="jumbotron">
+        
         @foreach ($comments as $comment)
+        <div class="container">
             <hr>
             <small>commented by: {{$comment->name}}</small>
             <h5>{!!$comment->comment!!}</h5>
@@ -69,8 +69,8 @@
                 @endif
             @endif
             <hr>
-        @endforeach
         </div>
+        @endforeach
     </div>
 @endsection
 <script>
@@ -90,14 +90,12 @@ $(document).ready(function() {
     var dropzone = document.getElementById('ta');
     const pictureOnly = ["image/gif", "image/jpeg", "image/png"];
     var check;
+    document.getElementById("ta").addEventListener("paste", handlePaste);
     dropzone.ondrop = function(e) {
         e.preventDefault();
         readfiles(e.dataTransfer.files);
     };
-
-    window.onload = function() {
-     document.getElementById("ta").addEventListener("paste", handlePaste);
-    };
+    
 
     function handlePaste(e) {
         if(e.clipboardData.files.length != 0) {
@@ -108,6 +106,7 @@ $(document).ready(function() {
     }
     
     function readfiles(files) {
+
         var formData = new FormData();
         if(typeof files.length !== 'undefined') {
             for (var i = 0; i < files.length; i++) {
@@ -178,7 +177,6 @@ $(document).ready(function() {
                 data: formData,
                 async: true,
                 success: function (res) {
-                    // console.log(res);
                     window.location = res.url;
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -187,6 +185,9 @@ $(document).ready(function() {
                 cache: false,
                 contentType: false,
                 processData: false
+            }).fail(function($xhr) {
+                var data = $xhr.responseJSON;
+                console.log(data);
             });
         }
     });

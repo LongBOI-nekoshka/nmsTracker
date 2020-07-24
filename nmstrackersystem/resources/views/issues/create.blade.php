@@ -161,7 +161,7 @@ $( document ).ready(function() {
     }
 
     window.onload = function() {
-     document.getElementById("ta").addEventListener("paste", handlePaste);
+        document.getElementById("ta").addEventListener("paste", handlePaste);
     };
 
     function handlePaste(e) {
@@ -243,14 +243,13 @@ $( document ).ready(function() {
                 success: function (res) {
                     window.location = res.url;
                 },
-                error: function(XMLHttpRequest, textStatus, errorThrown){
-                    alert('file is large');
-                    window.location = '/project/{{$project_Id->Project_Id}}/issue/create'
-                },
                 cache: false,
                 contentType: false,
                 processData: false
-            });
+            }).fail( function($xhr) {
+                alert('file is large');
+                window.location = '/project/{{$project_Id->Project_Id}}/issue/create'
+            });;
         }
     });
 });

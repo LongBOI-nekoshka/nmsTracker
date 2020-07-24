@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Project;
 use App\Issue;
 use App\User;
 use App\Comment;
 use DB;
+
+/**
+ * on update check if img is deleted
+ */
 
 class IssueController extends Controller
 {
@@ -25,6 +30,12 @@ class IssueController extends Controller
         //
         $issues = Issue::where('Project_Id',$id)->orderBy('Issue_Id','DESC')->get();
         $project = Project::where('Project_Id',$id)->get();
+        try {
+            $project->Project_Id;
+        }catch(\Exception $e) {
+            $error = 404;
+            return response()->view('errors.custom',compact('error'));
+        }
         // $columnList = DB::getSchemaBuilder()->getColumnListing('issues');
         return view('issues.index',compact(['project','issues']));
     }
@@ -97,6 +108,7 @@ class IssueController extends Controller
             $temp = array();
             $temphtml = array();
             $word = array();
+            $pictureNames = '';
             for($i = 0; $i < sizeof($_FILES); $i++) {
                 $fileNameWithExt = $request->file('file'.$i)->getClientOriginalName();
                 $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -116,8 +128,10 @@ class IssueController extends Controller
                     $temphtml[sizeof($temphtml)-1] = strtr($temphtml[sizeof($temphtml)-1],array(array_unique($word)[$j-1] => $temp[$j-1]));
                 }
                 for($k = 0; $k < sizeof($temp); $k++) {
-                    $path = $request->file('file'.$k)->storeAs('public/picture', $temp[$k]);
+                    $request->file('file'.$k)->storeAs('public/picture', $temp[$k]);
+                    $pictureNames = $pictureNames.'{'.$temp[$k].'}';
                 }
+                $issue->Picture =  $pictureNames;
                 $issue->Description = $temphtml[sizeof($temphtml)-1];
             }else {
                 $_FILES = [];
@@ -142,10 +156,18 @@ class IssueController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id,$idd) {
+
         $comments = Comment::where('comments.issue_Id',$idd)->rightjoin('users','users.id','=','comments.user_id')->orderBy('comment_id','DESC')->get();
         $issue = Issue::where('Issue_Id',$idd)->get();
         if(!empty(auth()->user())) {
             $user_Info = User::find(auth()->user()->id);
+            try {
+                $issue->Name;
+            }catch(\Exception $e) {
+                $error = 404;
+                return response()->view('errors.custom',compact('error'));
+            }
+            
             return view('issues.show',compact(['issue', 'id','idd','user_Info','comments']));
         }
         return view('issues.show',compact(['issue', 'id','idd','comments']));
@@ -233,12 +255,25 @@ class IssueController extends Controller
      */
     public function destroy($id,$idd)
     {
-        //
         $issue = Issue::find($idd);
         $user_Info = User::find(auth()->user()->id);
         if(auth()->user()->id === $issue->Issuer_Id || $user_Info->role === 'admin' || $user_Info->role === 'mod') {
-            $comment = Comment::where('issue_Id',$idd);
-            $comment->delete();
+            $comment = Comment::where('issue_Id',$idd)->get();
+            $comments = Comment::where('issue_Id',$idd);
+            if(!empty($issue->Picture)) {
+                preg_match_all('/{(.*?)}/', $issue->Picture, $match);
+                foreach ($match[1] as $key) {
+                    Storage::delete('public/picture/'.$key);
+                }
+                
+            }
+            if(!empty($comment[0]['Picture'])) {
+                preg_match_all('/{(.*?)}/', $comment[0]['Picture'], $match);
+                foreach ($match[1] as $key) {
+                    Storage::delete('public/picture/'.$key);
+                }
+            }
+            $comments->delete();
             $issue->delete();
             return redirect('/project/'.$id.'/issue')->with('success','Issue is deleted');
         }        
