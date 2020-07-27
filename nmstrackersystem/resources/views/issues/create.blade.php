@@ -16,7 +16,7 @@
         {!! Form::open(['id'=>'sendIssue','files' => true,'enctype' => 'multipart/form-data']) !!}
             <div class="form-group">
                 {{Form::label('name','Name')}}
-                {{Form::text('name','',['class' => 'form-control','placeholder' => 'Name of Issue'])}}
+                {{Form::text('name','',['class' => 'form-control', 'id' => 'name','placeholder' => 'Name of Issue'])}}
             </div>
             <div class="form-group">
                 @if(Auth::guest())
@@ -210,6 +210,12 @@ $( document ).ready(function() {
     }
     $('#sendIssue').on('submit', function(event) {
         event.preventDefault();
+        if($("#ta").val() == '') {
+            alert('Description is needed');
+        }
+        if($("#name").val() == '') {
+            alert('Issue name is needed');
+        }
         var data = $(this).serialize();
         var formData = new FormData(this);
         if(arrayFiles.length == 0) {

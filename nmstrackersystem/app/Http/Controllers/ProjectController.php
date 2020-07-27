@@ -122,7 +122,7 @@ class ProjectController extends Controller
         $project->ProjectName = $request->input('project_Name');
         $project->Description = $request->input('description');
         $project->save();
-        return redirect('/dashboard')->with('success','Project Created');
+        return redirect('/project/'.$id)->with('success','Project Created');
     }
 
     /**

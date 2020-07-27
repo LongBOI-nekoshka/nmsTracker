@@ -64,9 +64,9 @@
             </div>
             <div class="form-group">
                 {{Form::label('description','Description')}}
-                {{Form::textarea('description',$issue->Description,['class' => 'form-control','rows' =>'4','cols' => '11'])}}
+                <p class="text-danger">*you connot upload pictures here</p>
+                {{Form::textarea('description',strtr($issue->Description, array('<p><img style="width:30%" src="/storage/picture/' => '{--', '"></p>' => '--}')),['class' => 'form-control','rows' =>'4','cols' => '11'])}}
                 <br>
-                {{Form::file('picture')}}
             </div>
             {{Form::hidden('_method','PUT')}}
             {{Form::submit('Submit',['class' => 'btn btn-primary'])}}

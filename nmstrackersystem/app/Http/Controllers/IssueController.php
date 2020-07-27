@@ -9,7 +9,10 @@ use App\Issue;
 use App\User;
 use App\Comment;
 use DB;
-
+/**
+ * update get description find file name if not in string then delete file
+ * try convert tag to {--filename--} this format and send it to description
+ */
 /**
  * on update check if img is deleted
  */
@@ -31,7 +34,7 @@ class IssueController extends Controller
         $issues = Issue::where('Project_Id',$id)->orderBy('Issue_Id','DESC')->get();
         $project = Project::where('Project_Id',$id)->get();
         try {
-            $project->Project_Id;
+            $project[0];
         }catch(\Exception $e) {
             $error = 404;
             return response()->view('errors.custom',compact('error'));
@@ -162,7 +165,7 @@ class IssueController extends Controller
         if(!empty(auth()->user())) {
             $user_Info = User::find(auth()->user()->id);
             try {
-                $issue->Name;
+                $issue[0]['Issue_Id'];
             }catch(\Exception $e) {
                 $error = 404;
                 return response()->view('errors.custom',compact('error'));
@@ -215,36 +218,34 @@ class IssueController extends Controller
                 'assignee' => 'required',
             ]);
         }
-        if($request->hasFile('picture')) {
-            $fileNameWithExt = $request->file('picture')->getClientOriginalName();
-            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            $extention = $request->file('picture')->getClientOriginalExtension();
-            $fileNameToStore = $filename.'_'.time().'.'. $extention;
-            $path = $request->file('picture')->storeAs('public/picture', $fileNameToStore);
-        }
-
+        
         $issue = Issue::find($idd);
+        preg_match_all('/{(.*?)}/', $issue->Picture, $match);
+        if(!empty($match[1])) {
+            for($i = 0; $i < sizeof($match[1]); $i++) {
+                strpos($request->input('description'),$match[1][$i]) !== false ? 'yes' : Storage::delete('public/picture/'.$match[1][$i]);
+            }
+        }
+        
+            
         if(!empty($request->input('assignee'))) {
             $user = User::find($request->input('assignee'));
             $issue->assignee_id = $request->input('assignee');
             $issue->assignee = $user->name;
         }
-
+        
         if($request->input('assignee') !== 'assigned' || $request->input('assignee') !== 'in-progress') {
             $issue->assignee_idd = NULL;
         }
 
         $issue->Name = $request->input('name');
-        $issue->Description = $request->input('description');
-        if ($request->hasFile('picture')) {
-            $issue->Picture = $fileNameToStore;
-        }
+        $issue->Description = strtr($request->input('description'), array('{--' => '<p><img style="width:30%" src="/storage/picture/', '--}' => '"></p>'));
         
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');
         $issue->status = $request->input('status');
         $issue->save();
-        return redirect('/project')->with('success', 'Issue have been submited');
+        return redirect('/project/'.$id.'/issue/'.$idd)->with('success', 'Issue have been submited');
     }
 
     /**
