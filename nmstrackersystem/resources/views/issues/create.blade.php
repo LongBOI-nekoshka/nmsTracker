@@ -21,7 +21,7 @@
         content: "";
     }
     img {
-        width: 40%;
+        width: 20%;
     }
 </style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -174,6 +174,7 @@
 </script>
 <script>
 $( document ).ready(function() {
+    var img = [];
     var arrayFiles = [];
     var dropzone = document.getElementById('ta');
     var manualUpload = document.getElementById('manualUpload');
@@ -219,6 +220,13 @@ $( document ).ready(function() {
                     writable: true,
                     value: arrayFiles[arrayFiles.length-1]['name'].split('.').slice(0, -1).join('.')+arrayFiles.length+'.'+arrayFiles[arrayFiles.length-1]['name'].split('.').pop(),
                 });
+            }
+            for(var i = 0; i < arrayFiles.length; i++) {
+                var read = new FileReader();
+                read.readAsDataURL(arrayFiles[i]);
+            }
+            read.onload = function() {
+                img.push(read.result);
             }
         }
         console.log(arrayFiles[0]['name']);
@@ -290,31 +298,18 @@ $( document ).ready(function() {
         }
     });
     $('#previewThis').hide();
-    $('#write').click(function() {
+    $('#write').change(function() {
         $('#previewThis').hide();
         $('#ta').show();
     });
-    $('#preview').click(function() {
+    $('#preview').change(function() {
         $('#ta').hide();
         $('#previewThis').show();
         $('#previewThis').html($('#ta').val().replace(/(?:\r\n|\r|\n)/g, '<br>'));
         if(arrayFiles.length > 0) {
-            for(var i = 0; i < arrayFiles.length; i++) {
-                if($('#ta').val().includes(arrayFiles[i].name.split('.').slice(0, -1).join('.')) && $('#ta').val().includes('{--') && $('#ta').val().includes('--}')) { 
-                    var read = new FileReader();
-
-                    read.readAsDataURL(arrayFiles[i]);
-                    read.onload = function(e) {
-                        var raw = read.result;
-                        console.log(raw);
-                        var rep = $('#previewThis').html().replace('{--'+arrayFiles[i-1].name.split('.').slice(0, -1).join('.')+'--}','<img src='+raw+'>');
-                        $('#previewThis').html(rep);
-                    }
-                }else {
-                    arrayFiles.pop();
-                    console.log(arrayFiles);
-                }
-                
+            for(var i = 0; i < img.length; i++) {
+                var rep = $('#previewThis').html().replace('{--'+arrayFiles[i].name.split('.').slice(0, -1).join('.')+'--}','<img src='+img[i]+'>');
+                $('#previewThis').html(rep);
             }
         }
     });
