@@ -5,6 +5,25 @@
         integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
         crossorigin="anonymous">
 </script>
+<style>
+    .editable {
+        width: 100%;
+        border-bottom: 1px solid  #CED4DA;
+        padding: 5px;
+    }
+
+    .editable[placeholder]:empty:before {
+        content: attr(placeholder);
+        color: #6C757D; 
+    }
+
+    .editable[placeholder]:empty:focus:before {
+        content: "";
+    }
+    img {
+        width: 40%;
+    }
+</style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
     <div class="container">
@@ -88,8 +107,16 @@
                 @endif
             </div>
             <div class="form-group">
-                {{Form::label('description','Description')}}
-                {{Form::textarea('description','',['class' => 'form-control', 'id' => 'ta','rows' =>'4','cols' => '11'])}}
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-outline-dark active">
+                        <input type="radio" id="write" checked> write
+                      </label>
+                      <label class="btn btn-outline-dark">
+                        <input type="radio" id="preview"> preview
+                      </label>
+                </div>
+                <div id='previewThis' class="editable" placeholder="Nothing to Preview" contenteditable="false"></div>
+                {{Form::textarea('description','',['class' => 'form-control', 'id' => 'ta','rows' =>'4','cols' => '11', 'placeholder' => 'Description'])}}
                 <br>
                 {{Form::file('[]',['id' => 'manualUpload','class' => 'form-control-file','multiple' => 'multiple'])}}
             </div>
@@ -104,6 +131,7 @@
     </div>
 @endsection
 <script>
+    
     function change() {
         var x = document.getElementById("status").value;
         if(x == 'assigned' || x == 'in-Progress') {
@@ -151,6 +179,8 @@ $( document ).ready(function() {
     var manualUpload = document.getElementById('manualUpload');
     const pictureOnly = ["image/gif", "image/jpeg", "image/png"];
     var check;
+
+
     dropzone.ondrop = function(e) {
         e.preventDefault();
         readfiles(e.dataTransfer.files);
@@ -191,6 +221,7 @@ $( document ).ready(function() {
                 });
             }
         }
+        console.log(arrayFiles[0]['name']);
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -258,5 +289,43 @@ $( document ).ready(function() {
             });;
         }
     });
+    $('#previewThis').hide();
+    $('#write').click(function() {
+        $('#previewThis').hide();
+        $('#ta').show();
+    });
+    $('#preview').click(function() {
+        $('#ta').hide();
+        $('#previewThis').show();
+        $('#previewThis').html($('#ta').val().replace(/(?:\r\n|\r|\n)/g, '<br>'));
+        if(arrayFiles.length > 0) {
+            for(var i = 0; i < arrayFiles.length; i++) {
+                if($('#ta').val().includes(arrayFiles[i].name.split('.').slice(0, -1).join('.')) && $('#ta').val().includes('{--') && $('#ta').val().includes('--}')) { 
+                    var read = new FileReader();
+
+                    read.readAsDataURL(arrayFiles[i]);
+                    read.onload = function(e) {
+                        var raw = read.result;
+                        console.log(raw);
+                        var rep = $('#previewThis').html().replace('{--'+arrayFiles[i-1].name.split('.').slice(0, -1).join('.')+'--}','<img src='+raw+'>');
+                        $('#previewThis').html(rep);
+                    }
+                }else {
+                    arrayFiles.pop();
+                    console.log(arrayFiles);
+                }
+                
+            }
+        }
+    });
+    // function createElems(tagName) {
+    //     var child = document.createElement(tagName);
+    //     var parent = document.getElementById('#previewThis')[0];
+    //     parent.appendChild(child);
+    // }
+    // function attrImg(tagName, tagIndex, attrName, attrVal) {
+    //     var child = document.getElementsByTagName(tagName)[tagIndex];
+    //     child.setAttribute(attrName,attrVal);
+    // }
 });
 </script>
