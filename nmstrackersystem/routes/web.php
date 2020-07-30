@@ -16,6 +16,7 @@ Route::get('/', 'PagesController@index');
 Route::get('/about', 'PagesController@about');
 Route::get('/showAllIssues', 'PagesController@showAllIssues');
 Route::get('/assignedIssues', 'PagesController@assignedIssues');
+Route::get('/createfast', 'PagesController@createfast');
 Route::resource('/project', 'ProjectController');
 Route::resource('/project/{project}/issue', 'IssueController');
 Route::resource('/project/{project}/issue/{issue}/comment', 'CommentController',['only'=>['store','destroy']]);
@@ -25,8 +26,7 @@ Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('login/google', 'Auth\LoginController@redirectToProvider');
 Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');
 Route::post('/upload', 'TempAjaxUpload@post');
-Route::post('/save', 'TempAjaxUpload@save');
-// Route::get('/', function () {
+// Route::get('/awaw', function () {
 //     return view('welcome');
 // });
 

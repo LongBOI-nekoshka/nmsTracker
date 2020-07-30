@@ -27,12 +27,19 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
     <div class="container">
-        <a href="/project/{{$project_Id->Project_Id}}" class="btn btn-secondary">Go Back</a>
+        <a href="/" class="btn btn-secondary">Go Back</a>
         <br>
         <br>
         <h4>Create Issue</h4>
         <!--   -->
         {!! Form::open(['id'=>'sendIssue','files' => true,'enctype' => 'multipart/form-data']) !!}
+            <label for="hidden">Select Project</label><br>
+            <select class="btn btn-outline-info" id="hidden">
+                <option value=""></option>
+                @foreach ($getProjectId as $item)
+                    <option value="{{$item->Project_Id}}">{{$item->ProjectName}}</option>
+                @endforeach
+            </select>
             <div class="form-group">
                 {{Form::label('name','Name')}}
                 {{Form::text('name','',['class' => 'form-control', 'id' => 'name','placeholder' => 'Name of Issue'])}}
@@ -120,7 +127,7 @@
                 <br>
                 {{Form::file('[]',['id' => 'manualUpload','class' => 'form-control-file','multiple' => 'multiple'])}}
             </div>
-            {{Form::hidden('secret',$project_Id->Project_Id)}}
+            {{Form::hidden('secret','',['id' => 'hide'])}}
             @if(Auth::guest())
                 <div class="g-recaptcha" data-sitekey="6Le7_rcZAAAAAOH2h05uKtpWOyl_-zsgaQ0r1PDh"></div>             
             @endif
@@ -249,52 +256,57 @@ $( document ).ready(function() {
     }
     $('#sendIssue').on('submit', function(event) {
         event.preventDefault();
-        if($("#ta").val() == '') {
-            alert('Description is needed');
-        }
-        if($("#name").val() == '') {
-            alert('Issue name is needed');
-        }
-        var data = $(this).serialize();
-        var formData = new FormData(this);
-        if(arrayFiles.length == 0) {
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: '/project/{$project_Id->Project_Id}/issue',
-                type: 'POST',
-                data:  formData,
-                async: true,
-                success: function (res) {
-                    window.location = res.url;
-                },
-                cache: false,
-                contentType: false,
-                processData: false
-            });
-        }else {
-            for (var i = 0; i < arrayFiles.length; i++) {
-                formData.append('file'+i, arrayFiles[i],arrayFiles[i]['name'].split('.').slice(0, -1).join('.')+'.'+arrayFiles[i]['name'].split('.').pop());
+        if($('#hidden').val() != '') {
+            $('#hide').val($('#hidden').val());
+            console.log($('#hide').val());
+            if($("#ta").val() == '') {
+                alert('Description is needed');
             }
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: '/project/{$project_Id->Project_Id}/issue',
-                type: 'POST',
-                data: formData,
-                async: true,
-                success: function (res) {
-                    window.location = res.url;
-                },
-                cache: false,
-                contentType: false,
-                processData: false
-            }).fail( function($xhr) {
-                alert('file is large');
-                window.location = '/project/{{$project_Id->Project_Id}}/issue/create'
-            });;
+            if($("#name").val() == '') {
+                alert('Issue name is needed');
+            }
+            var data = $(this).serialize();
+            var formData = new FormData(this);
+            if(arrayFiles.length == 0) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '/project/'+$('#hide').val()+'/issue',
+                    type: 'POST',
+                    data:  formData,
+                    async: true,
+                    success: function (res) {
+                        window.location = res.url;
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            }else {
+                for (var i = 0; i < arrayFiles.length; i++) {
+                    formData.append('file'+i, arrayFiles[i],arrayFiles[i]['name'].split('.').slice(0, -1).join('.')+'.'+arrayFiles[i]['name'].split('.').pop());
+                }
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '/project/'+$('#hide').val()+'/issue',
+                    type: 'POST',
+                    data: formData,
+                    async: true,
+                    success: function (res) {
+                        window.location = res.url;
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                }).fail( function($xhr) {
+                    alert('file is large');
+                });;
+            }
+        }else {
+            alert('select a project');
         }
     });
     $('#previewThis').hide();
@@ -313,14 +325,5 @@ $( document ).ready(function() {
             }
         }
     });
-    // function createElems(tagName) {
-    //     var child = document.createElement(tagName);
-    //     var parent = document.getElementById('#previewThis')[0];
-    //     parent.appendChild(child);
-    // }
-    // function attrImg(tagName, tagIndex, attrName, attrVal) {
-    //     var child = document.getElementsByTagName(tagName)[tagIndex];
-    //     child.setAttribute(attrName,attrVal);
-    // }
 });
 </script>

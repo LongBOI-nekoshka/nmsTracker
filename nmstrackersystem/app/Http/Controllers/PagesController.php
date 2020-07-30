@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Issue;
 use App\User;
+use App\Project;
 
 class PagesController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth',['except' => ['about','index','showAllIssues']]);
+        $this->middleware('auth',['except' => ['about','index','showAllIssues','createfast']]);
     }
     //
     public function index() {
@@ -31,5 +32,10 @@ class PagesController extends Controller
     public function assignedIssues() {
         $assigneIssues = Issue::where('assignee_id',auth()->user()->id)->whereRaw('(status = "assigned" OR status = "in-Progress")')->get();
         return view('pages.assigned')->with('assigneIssues',$assigneIssues);
+    }
+
+    public function createfast() {
+        $getProjectId = Project::select('Project_Id','ProjectName')->get();
+        return view('pages.quick',compact(['getProjectId']));
     }
 }

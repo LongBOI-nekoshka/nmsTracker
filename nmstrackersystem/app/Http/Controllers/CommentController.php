@@ -51,8 +51,9 @@ class CommentController extends Controller
         $comment = new Comment;
         $comment->user_id = auth()->user()->id;
         $comment->issue_id = $request->input('issue_id');
-        $search = strtr($request->input('comment'), array('{--' => '<p><img style="width:25%" src="/storage/picture/', '--}' => '"></p>'));
-        preg_match_all('/{--(.*?)--}/', $request->input('comment'), $match);
+        $com = htmlentities($request->input('comment'));
+        $search = strtr($com, array('{--' => '<p><img style="width:45%" src="/storage/picture/', '--}' => '"></p>'));
+        preg_match_all('/{--(.*?)--}/', $com, $match);
         if(empty($match[1])) {
             $_FILES = [];
         }

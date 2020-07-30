@@ -87,10 +87,10 @@ class IssueController extends Controller
             'name'=>'required',
             'description'=>'required'
         ]);
-
         $issue = new Issue;
-        $search = strtr($request->input('description'), array('{--' => '<p><img style="width:30%" src="/storage/picture/', '--}' => '"></p>'));
-        preg_match_all('/{--(.*?)--}/', $request->input('description'), $match);
+        $notag = htmlentities($request->input('description'));
+        $search = strtr($notag, array('{--' => '<p><img style="width:30%" src="/storage/picture/', '--}' => '"></p>'));
+        preg_match_all('/{--(.*?)--}/', $notag, $match);
         if(!empty(auth()->user())) {
             $user_email = User::find(auth()->user()->id);
             $issue->Issuer_Id = auth()->user()->id;
@@ -141,7 +141,7 @@ class IssueController extends Controller
             }
         }
         if(empty($_FILES)) {
-            $issue->Description = $request->input('description');
+            $issue->Description = htmlentities($request->input('description'));
         }
         $issue->Name = $request->input('name');
         $issue->Priority = $request->input('priority');
@@ -218,12 +218,12 @@ class IssueController extends Controller
                 'assignee' => 'required',
             ]);
         }
-        
+        $notag = htmlentities($request->input('description'));
         $issue = Issue::find($idd);
         preg_match_all('/{(.*?)}/', $issue->Picture, $match);
         if(!empty($match[1])) {
             for($i = 0; $i < sizeof($match[1]); $i++) {
-                strpos($request->input('description'),$match[1][$i]) !== false ? 'yes' : Storage::delete('public/picture/'.$match[1][$i]);
+                strpos($notag,$match[1][$i]) !== false ? 'yes' : Storage::delete('public/picture/'.$match[1][$i]);
             }
         }
         
@@ -239,7 +239,7 @@ class IssueController extends Controller
         }
 
         $issue->Name = $request->input('name');
-        $issue->Description = strtr($request->input('description'), array('{--' => '<p><img style="width:30%" src="/storage/picture/', '--}' => '"></p>'));
+        $issue->Description = strtr($notag, array('{--' => '<p><img style="width:30%" src="/storage/picture/', '--}' => '"></p>'));
         
         $issue->Priority = $request->input('priority');
         $issue->tracker = $request->input('tracker');

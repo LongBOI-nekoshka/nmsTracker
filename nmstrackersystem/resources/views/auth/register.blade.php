@@ -63,7 +63,7 @@
                         </div>
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <div class="g-recaptcha" data-sitekey="6LccBqwZAAAAAIKQt2sSvHoybs5_ifEgAuW9xGER">
+                                <div class="g-recaptcha" data-sitekey="6Le7_rcZAAAAAOH2h05uKtpWOyl_-zsgaQ0r1PDh">
                                 </div>
                                 <br>
                                 <button type="submit" class="btn btn-primary">
